@@ -16,6 +16,8 @@ export const createUser = (data) => api.post('/add.user', data)
 export const updateUser = (id, data) => api.put(`/edit.user/${id}`, data)
 export const toggleUserStatus = (id) => api.put(`/toggle.status.user/${id}`)
 export const changePassword = (data) => api.put('/change.password', data)
+export const countuser = () => api.get('/count.user')
+export const getrole = () => api.get('/view.role')
 
 // Shift
 export const createShift = (data) => api.post('/add.shift', data)

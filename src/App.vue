@@ -18,10 +18,24 @@ body {
   background: #f0f2f5;
 }
 
+.el-button,
+.el-input,
+.el-select,
+.el-dialog,
+.el-table,
+.el-menu,
+.el-form,
+.el-card,
+.el-dropdown,
+.el-pagination {
+  font-family: 'Siemreap', sans-serif !important;
+}
+
 :root {
   --primary: #083767;
   --success: #67c23a;
   --warning: #e6a23c;
   --danger: #f56c6c;
+  
 }
 </style>
