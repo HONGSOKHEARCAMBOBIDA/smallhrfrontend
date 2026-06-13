@@ -30,3 +30,4 @@ export const getAttendance = (params) => api.get('/view.attendance', { params })
 // Payroll
 export const getPayrollDraft = (params) => api.get('/view.payroll.draft', { params })
 export const createPayroll = (data) => api.post('/add.payroll', data)
+export const getPayroll = (params) => api.get('/view.payroll',{params})

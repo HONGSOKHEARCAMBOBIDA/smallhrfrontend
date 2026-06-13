@@ -27,6 +27,7 @@ body {
 .el-form,
 .el-card,
 .el-dropdown,
+.el-date-picker,
 .el-pagination {
   font-family: 'Siemreap', sans-serif !important;
 }

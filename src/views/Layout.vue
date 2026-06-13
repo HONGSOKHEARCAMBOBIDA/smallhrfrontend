@@ -62,7 +62,8 @@ const nav = [
   { path: '/company',    icon: 'OfficeBuilding', label: 'ក្រុមហ៑ុន',      short: 'ក្រុមហ៑ុន' },
   { path: '/users',      icon: 'User',           label: 'បុគ្គលិក',       short: 'បុគ្គលិក' },
   { path: '/attendance', icon: 'Clock',          label: 'វត្តមាន',         short: 'វត្តមាន' },
-  { path: '/payroll',    icon: 'Money',          label: 'ប្រាក់ខែ',        short: 'ប្រាក់ខែ' },
+  { path: '/payroll',    icon: 'Money',          label: 'បេីកប្រាក់ខែ',        short: 'បេីកប្រាក់ខែ' },
+  { path: '/payrolllist',    icon: 'Money',          label: 'របាយការណ៍ប្រាក់ខែ',        short: 'របាយការណ៍ប្រាក់ខែ' },
   { path: '/profile',    icon: 'Setting',        label: 'ប្រវត្តរូប',      short: 'ប្រវត្តរូប' },
 ]
 
