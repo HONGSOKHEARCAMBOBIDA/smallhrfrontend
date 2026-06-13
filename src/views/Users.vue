@@ -137,21 +137,21 @@
               </el-select>
             </el-col>
             <el-col :span="4">
-              <el-select v-model="shift.shift_type" placeholder="Type" size="large">
+              <el-select v-model="shift.shift_type" placeholder="Type" size="large" clearable>
                 <el-option label="ធ្វេីការពេញម៉ោង" :value="1" />
                 <el-option label="ធ្វេីការតែមួយព្រឹក" :value="2" />
                 <el-option label="ធ្វេីការតែមួយរសៀល" :value="3" />
               </el-select>
             </el-col>
-            <el-col :span="3"><el-time-select v-model="shift.check_in1" placeholder="In 1" size="large" start="00:00" end="23:30" /></el-col>
+            <el-col :span="3"><el-time-select v-model="shift.check_in1" placeholder="In 1" size="large" start="00:00" end="23:30"  /></el-col>
             <el-col :span="3"><el-time-select v-model="shift.check_out1" placeholder="Out 1" size="large" start="00:00" end="23:30" /></el-col>
             <el-col :span="3"><el-time-select v-model="shift.check_in2" placeholder="In 2" size="large" start="00:00" end="23:30" /></el-col>
             <el-col :span="3"><el-time-select v-model="shift.check_out2" placeholder="Out 2" size="large" start="00:00" end="23:30" /></el-col>
             <el-col :span="2">
-              <el-checkbox v-model="shift.is_dayoff" size="large">Off</el-checkbox>
+              <el-checkbox v-model="shift.is_dayoff" size="large">សម្រាក</el-checkbox>
             </el-col>
             <el-col :span="2">
-              <el-button size="small" icon="Delete" circle type="danger" @click="createForm.shifts.splice(i,1)" />
+              <el-button size="large" icon="Delete" circle type="danger" @click="createForm.shifts.splice(i,1)" />
             </el-col>
           </el-row>
         </div>
@@ -246,14 +246,14 @@
 <el-dialog
   v-model="shiftsDialog"
   :title="`វេនធ្វើការ របស់ ${selectedUser?.name}`"
-   width="70%"
+  width="983px"
   class="shift-dialog"
   @closed="shiftsEditMode = false"
 >
   <div style="display:flex; justify-content:flex-end; margin-bottom:12px">
       <el-button
     icon="Plus"
-    size="large"
+    size="small"
     type="success"
     :disabled="selectedUser?.shift_response?.length >= 7"
     @click="startShiftCreate"
@@ -263,7 +263,7 @@
     <el-button
       v-if="!shiftsEditMode"
       icon="Edit"
-      size="large"
+      size="small"
       @click="startShiftEdit"
     >
       កែប្រែ
@@ -278,11 +278,11 @@
     border
     empty-text="មិនមានទិន្នន័យវេនការងារ"
   >
-    <el-table-column prop="day_name" label="ថ្ងៃ" width="180" />
+    <el-table-column prop="day_name" label="ថ្ងៃ" width="100" />
 
-    <el-table-column label="ប្រភេទ" width="220">
+    <el-table-column label="ប្រភេទ" width="170">
       <template #default="{ row }">
-        <el-select v-if="shiftsEditMode" v-model="row.shift_type" size="large" style="width:100%">
+        <el-select v-if="shiftsEditMode" v-model="row.shift_type" size="small" style="width:100%" clearable>
           <el-option label="ធ្វេីការពេញម៉ោង" :value="1" />
           <el-option label="ធ្វេីការតែមួយព្រឹក"  :value="2" />
           <el-option label="ធ្វេីការតែមួយរសៀល"  :value="3" />
@@ -291,37 +291,37 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="ចូលវេន១" width="225">
+    <el-table-column label="ចូលវេន១" width="145">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_in1" size="large"   start="00:00" end="23:30" />
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_in1" size="small"   start="00:00" end="23:30"  />
         <span v-else>{{ row.check_in1 || '—' }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column label="ចេញវេន១" width="225">
+    <el-table-column label="ចេញវេន១" width="145">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_out1" size="large" start="00:00" end="23:30"/>
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_out1" size="small" start="00:00" end="23:30"/>
         <span v-else>{{ row.check_out1 || '—' }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column label="ចូលវេន២" width="225">
+    <el-table-column label="ចូលវេន២" width="145">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_in2" size="large" start="00:00" end="23:30"/>
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_in2" size="small" start="00:00" end="23:30"/>
         <span v-else>{{ row.check_in2 || '—' }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column label="ចេញវេន២" width="225">
+    <el-table-column label="ចេញវេន២" width="145">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_out2" size="large" start="00:00" end="23:30"/>
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_out2" size="small" start="00:00" end="23:30"/>
         <span v-else>{{ row.check_out2 || '—' }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column label="ថ្ងៃសម្រាក" width="200" align="center">
+    <el-table-column label="ថ្ងៃសម្រាក" width="100" align="center">
       <template #default="{ row }">
-        <el-checkbox v-if="shiftsEditMode" v-model="row.is_dayoff" style="transform: scale(1.5);" />
+        <el-checkbox v-if="shiftsEditMode" v-model="row.is_dayoff" />
         <el-tag v-else :type="row.is_dayoff ? 'danger' : 'success'">
           {{ row.is_dayoff ? 'សម្រាក' : 'ធ្វើការ' }}
         </el-tag>
@@ -331,8 +331,8 @@
 
   <template #footer>
     <template v-if="shiftsEditMode">
-      <el-button @click="cancelShiftEdit" size="large">បោះបង់</el-button>
-      <el-button type="primary" :loading="savingShifts" @click="handleShiftUpdate" size="large">
+      <el-button @click="cancelShiftEdit">បោះបង់</el-button>
+      <el-button type="primary" :loading="savingShifts" @click="handleShiftUpdate">
         រក្សាទុក
       </el-button>
     </template>
@@ -581,13 +581,13 @@ async function fetchRole(){
 
 function openCreate() {
     createForm.shifts = [
-    { day: 1, shift_type: 1, check_in1: '08:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
-    { day: 2, shift_type: 1, check_in1: '08:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
-    { day: 3, shift_type: 1, check_in1: '08:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
-    { day: 4, shift_type: 1, check_in1: '08:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
-    { day: 5, shift_type: 1, check_in1: '08:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
-    { day: 6, shift_type: 1, check_in1: '08:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
-    { day: 7, shift_type: 1, check_in1: '08:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false  }, 
+    { day: 1, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
+    { day: 2, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
+    { day: 3, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
+    { day: 4, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
+    { day: 5, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
+    { day: 6, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
+    { day: 7, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false  }, 
   ]
   Object.assign(createForm, { name: '', phone_hash: '', role_id: null, gender: null, base_salary: '', company_id: 0 })
   createDialog.value = true
@@ -606,14 +606,14 @@ async function handleCreate() {
       company_id: createForm.company_id,
       day: createForm.shifts.map(s => s.day),
       shift_type: createForm.shifts.map(s => s.shift_type),
-      check_in1: createForm.shifts.map(s => s.check_in1),
-      check_out1: createForm.shifts.map(s => s.check_out1),
-      check_in2: createForm.shifts.map(s => s.check_in2),
-      check_out2: createForm.shifts.map(s => s.check_out2),
+      check_in1: createForm.shifts.map(s => s.check_in1 || null),
+      check_out1: createForm.shifts.map(s => s.check_out1 || null),
+      check_in2: createForm.shifts.map(s => s.check_in2 || null),
+      check_out2: createForm.shifts.map(s => s.check_out2 || null),
       is_dayoff: createForm.shifts.map(s => s.is_dayoff),
     }
     await createUser(payload)
-    ElMessage.success('Employee created (default password: 12345678)')
+    ElMessage.success('បង្កេីតបុគ្គលិកបានជោគជ័យ')
     createDialog.value = false
     fetchUsers()
   } catch (e) { ElMessage.error(e.response?.data?.message || 'Failed to create') }

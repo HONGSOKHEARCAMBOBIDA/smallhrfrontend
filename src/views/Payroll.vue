@@ -4,18 +4,18 @@
     <el-card class="top-card">
       <template #header>
         <div style="display:flex; align-items:center; justify-content:space-between">
-          <span class="card-title">Payroll Draft</span>
+          <span class="card-title">ប្រាក់ខែត្រូវបេីក</span>
           <div style="display:flex; gap:10px; align-items:center">
             <el-select v-model="payrollType" style="width:160px" @change="fetchDraft">
-              <el-option label="Full Month" :value="1" />
-              <el-option label="Half Month" :value="2" />
+              <el-option label="បេីកពេញ១ខែ" :value="1" />
+              <el-option label="បេីកកន្លះខែ" :value="2" />
             </el-select>
             <el-button type="primary" icon="Refresh" @click="fetchDraft" :loading="draftLoading">
-              Load Draft
+              ទាញទិន្ន័យម្ដងទៀត
             </el-button>
             <el-button type="success" icon="Money" @click="confirmPayroll"
               :disabled="!selectedRows.length" :loading="paying">
-              Pay Selected ({{ selectedRows.length }})
+              បេីកប្រាក់ខែ ({{ selectedRows.length }}) នាក់
             </el-button>
           </div>
         </div>
@@ -23,60 +23,76 @@
 
       <el-table :data="draft" v-loading="draftLoading" @selection-change="selectedRows = $event" stripe>
         <el-table-column type="selection" width="50" />
-        <el-table-column prop="user_name" label="Employee" min-width="130" />
-        <el-table-column prop="role_name" label="Role" width="110" />
-        <el-table-column prop="basic_salary" label="Basic Salary" width="120">
+        <el-table-column prop="user_name" label="ឈ្មោះបុគ្គលិក" min-width="130" />
+        <el-table-column prop="role_name" label="តួនាទី" width="110" />
+        <el-table-column prop="basic_salary" label="ប្រាក់ខែគោល" width="120">
           <template #default="{ row }">{{ row.basic_salary }} {{ row.currency }}</template>
         </el-table-column>
-        <el-table-column prop="half_salary" label="Half Salary" width="115" />
-        <el-table-column prop="total_work_day" label="Work Days" width="100" align="center" />
-        <el-table-column prop="total_late" label="Late" width="75" align="center">
+        <el-table-column prop="half_salary" label="ប្រាក់ខែពាក់កណ្ដាល" width="155" />
+        <el-table-column prop="total_work_day" label="ចំនួនថ្ងៃធ្វើការ" width="100" align="center" />
+        <el-table-column prop="total_late" label="ចំនួនយឺត" width="105" align="center">
           <template #default="{ row }">
             <el-tag v-if="row.total_late" type="warning" size="small">{{ row.total_late }}</el-tag>
             <span v-else>—</span>
           </template>
         </el-table-column>
-        <el-table-column prop="total_left_early" label="Early Out" width="90" align="center">
+        <el-table-column prop="total_left_early" label="ចេញមុនម៉ោង" width="110" align="center">
           <template #default="{ row }">
             <el-tag v-if="row.total_left_early" type="danger" size="small">{{ row.total_left_early }}</el-tag>
             <span v-else>—</span>
           </template>
         </el-table-column>
-        <el-table-column prop="total_deduction" label="Deduction" width="110" />
-        <el-table-column label="Net Salary" width="130">
-          <template #default="{ row }">
-            <strong style="color:#67c23a">{{ row.net_salary }} {{ row.currency }}</strong>
-          </template>
+        <!-- <el-table-column prop="total_deduction" label="កាត់លុយ" width="110" /> -->
+         <el-table-column label="កាត់លុយ" width="80" align="center">
+            <template #default="{row}">
+<el-input
+  v-model="row.total_deduction"
+  :rows="1"
+  :autosize="{ minRows: 1, maxRows: 3 }"
+/>
+            </template>
+          </el-table-column>
+        <el-table-column label="ប្រាក់ខែទទួលបាន" width="180">
+         
+                    <template #default="{row}">
+<el-input
+  v-model="row.net_salary"
+  :rows="1"
+  :autosize="{ minRows: 1, maxRows: 3 }">
+<template #append>{{ row.currency }}</template>
+</el-input>
+
+            </template>
         </el-table-column>
-        <el-table-column label="Unpaid Days" width="110" align="center">
+        <el-table-column label="ផ្សេងៗ" width="110" align="center">
           <template #default="{ row }">
-            <el-tag type="info" size="small">{{ row.count_un_paid_attendance?.length || 0 }}</el-tag>
+            <el-tag type="info" size="small">{{ row.unpaid_attendance?.length || 0 }}</el-tag>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
 
     <!-- Pay Dialog -->
-    <el-dialog v-model="payDialog" title="Confirm Payroll" width="560px">
-      <el-alert title="Review payroll details before confirming. This action is irreversible." type="warning" show-icon :closable="false" style="margin-bottom:16px" />
+    <el-dialog v-model="payDialog" title="ពិនិត្យប្រាក់ខែម្ដងទៀត" width="720px">
+      <el-alert title="សូមពិនិត្យព័ត៌មានប្រាក់បៀវត្សរ៍ឱ្យបានត្រឹមត្រូវ មុនពេលបញ្ជាក់។ សកម្មភាពនេះមិនអាចត្រឡប់ក្រោយវិញបានទេ" type="warning" show-icon :closable="false" style="margin-bottom:16px" />
       <el-form :model="payForm" label-width="130px">
-        <el-form-item label="Payroll Date">
+        <el-form-item label="ថ្ងៃទីបេីកប្រាក់ខែ">
           <el-date-picker v-model="payForm.payroll_date" type="date" value-format="YYYY-MM-DD" style="width:100%" />
         </el-form-item>
-        <el-form-item label="Payroll Type">
+        <el-form-item label="ប្រភេទប្រាក់ខែ">
           <el-select v-model="payForm.payroll_type" style="width:100%">
-            <el-option label="Full Month" :value="1" />
-            <el-option label="Half Month" :value="2" />
+            <el-option label="បេីកពេញ១ខែ" :value="1" />
+            <el-option label="បេីកកន្លះខែ" :value="2" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Note">
+        <el-form-item label="សម្គល់">
           <el-input v-model="payForm.note" type="textarea" :rows="2" placeholder="Optional note" />
         </el-form-item>
       </el-form>
 
-      <el-table :data="selectedRows" size="small" max-height="200">
-        <el-table-column prop="user_name" label="Employee" />
-        <el-table-column prop="net_salary" label="Net Salary" width="120">
+      <el-table :data="selectedRows" size="large" max-height="400">
+        <el-table-column prop="user_name" label="ឈ្មោះបុគ្គលិក" />
+        <el-table-column prop="net_salary" label="ប្រាក់ខែទទួលបាន" width="150">
           <template #default="{ row }">{{ row.net_salary }} {{ row.currency }}</template>
         </el-table-column>
       </el-table>
@@ -140,10 +156,10 @@ async function submitPayroll() {
       payroll_date: payForm.payroll_date,
       status: 0,
       note: payForm.note,
-      attendance_id: row.count_un_paid_attendance || [],
+      attendance_id: row.unpaid_attendance || [],
     }))
     await createPayroll({ payrolls })
-    ElMessage.success('Payroll processed successfully')
+    ElMessage.success('ប្រាក់ខែបេីកបានជោគជ័យ')
     payDialog.value = false
     selectedRows.value = []
     fetchDraft()
@@ -158,6 +174,10 @@ onMounted(fetchDraft)
 </script>
 
 <style scoped>
-.top-card { border-radius: 12px; }
+.top-card { border-radius: 6px; }
 .card-title { font-weight: 600; font-size: 15px; }
+:deep(.el-table__header-wrapper th) {
+  background-color: #4589ce !important;
+  color: #ffffff !important;
+}
 </style>

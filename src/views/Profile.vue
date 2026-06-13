@@ -17,17 +17,17 @@
       <!-- Change Password -->
       <el-col :span="16">
         <el-card>
-          <template #header><span class="card-title">Change Password</span></template>
+          <template #header><span class="card-title">ប្ដូរពាក្យសម្ងាត់</span></template>
           <el-form :model="pwForm" :rules="pwRules" ref="pwFormRef" label-width="160px" style="max-width:460px">
-            <el-form-item label="New Password" prop="new_password">
+            <el-form-item label="ពាក្យសម្ងាត់ថ្មី" prop="new_password">
               <el-input v-model="pwForm.new_password" type="password" show-password />
             </el-form-item>
-            <el-form-item label="Confirm Password" prop="confirm_password">
+            <el-form-item label="បញ្ជាក់ពាក្យសម្ងាត់ថ្មី" prop="confirm_password">
               <el-input v-model="pwForm.confirm_password" type="password" show-password />
             </el-form-item>
             <el-form-item>
               <el-button type="primary" :loading="changingPw" @click="handleChangePassword">
-                Update Password
+                កែប្រែ
               </el-button>
             </el-form-item>
           </el-form>
@@ -83,7 +83,7 @@ async function handleChangePassword() {
 
 <style scoped>
 .profile-wrap {}
-.profile-card { border-radius: 12px; }
+.profile-card { border-radius: 6px; }
 .profile-avatar-section { text-align: center; padding: 20px 0; }
 .profile-avatar-section h2 { margin-top: 16px; font-size: 20px; font-weight: 700; }
 .profile-id { color: #888; font-size: 13px; margin-top: 4px; }

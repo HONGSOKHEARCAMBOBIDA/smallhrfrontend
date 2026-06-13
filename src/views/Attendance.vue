@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Check-in Action Card -->
-    <el-card class="checkin-card">
+    <!-- <el-card class="checkin-card">
       <template #header>
         <div style="display:flex; align-items:center; gap:8px">
           <el-icon color="#409eff"><Clock /></el-icon>
@@ -25,20 +25,17 @@
           <el-button icon="Aim" @click="getLocation" title="Auto-detect location" />
         </el-form-item>
       </el-form>
-    </el-card>
+    </el-card> -->
 
     <!-- Filters -->
     <el-card class="filter-card" style="margin-top:16px">
       <el-row :gutter="12">
         <el-col :span="5">
-          <el-input v-model="filters.name" placeholder="Search by name" prefix-icon="Search" clearable @change="fetchAttendance" />
+          <el-input v-model="filters.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable @change="fetchAttendance" />
         </el-col>
         <el-col :span="4">
-          <el-date-picker v-model="filters.check_date" type="date" placeholder="Filter by date"
+          <el-date-picker v-model="filters.check_date" type="date" placeholder="ជ្រេីសរេីសថ្ងៃទី"
             value-format="YYYY-MM-DD" clearable @change="fetchAttendance" style="width:100%" />
-        </el-col>
-        <el-col :span="4">
-          <el-input v-model="filters.company_id" placeholder="Company ID" clearable @change="fetchAttendance" />
         </el-col>
         <el-col :span="3">
           <el-button type="primary" icon="Search" @click="fetchAttendance">Search</el-button>
@@ -47,27 +44,29 @@
     </el-card>
 
     <!-- Attendance Table -->
-    <el-card style="margin-top:16px; border-radius:12px">
+    <el-card style="margin-top:16px; border-radius:6px">
       <el-table :data="attendance" v-loading="loading" stripe>
-        <el-table-column prop="name" label="Employee" min-width="130" />
-        <el-table-column prop="role_name" label="Role" width="110" />
-        <el-table-column prop="company_name" label="Company" min-width="130" />
-        <el-table-column prop="check_date" label="Date" width="120" />
-        <el-table-column prop="gender_string" label="Gender" width="90" />
-        <el-table-column label="Status" width="110">
+        <el-table-column prop="name" label="ឈ្មោះ" min-width="130" />
+        <el-table-column prop="gender_string" label="ភេទ" width="90" />
+        <el-table-column prop="role_name" label="តួនាទី" width="110" />
+        <el-table-column prop="company_name" label="ក្រុមហ៑ុន" min-width="130" />
+        <el-table-column prop="check_date" label="ថ្ងៃស្កែន" width="120" />
+        <el-table-column label="ស្ថានភាព" width="110">
           <template #default="{ row }">
             <el-tag :type="row.status === 'COMPLETE' ? 'success' : 'warning'" size="small">
               {{ row.status }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Records" width="90" align="center">
-          <template #default="{ row }">
-            <el-badge :value="row.attendance_record_response?.length || 0" type="info">
-              <el-button size="small" icon="List" circle @click="viewRecords(row)" />
-            </el-badge>
-          </template>
-        </el-table-column>
+<el-table-column label="លម្អិត" width="100" align="center">
+  <template #default="{ row }">
+    <div class="detail-action">
+      <el-badge :value="row.attendance_record?.length || 0" :type="row.status === 'COMPLETE' ? 'success' : 'warning'">
+        <el-button size="small" icon="List" circle @click="viewRecords(row)" />
+      </el-badge>
+    </div>
+  </template>
+</el-table-column>
       </el-table>
 
       <div class="pagination-wrap">
@@ -77,28 +76,28 @@
     </el-card>
 
     <!-- Attendance Records Detail Dialog -->
-    <el-dialog v-model="recordsDialog" :title="`Attendance Records — ${selectedRow?.name}`" width="860px">
-      <el-table :data="selectedRow?.attendance_record_response || []" size="small" stripe>
-        <el-table-column prop="day_string" label="Day" width="100" />
-        <el-table-column prop="type_string" label="Type" width="110" />
-        <el-table-column prop="check_time" label="Check Time" width="110" />
-        <el-table-column prop="scheduled_time" label="Scheduled" width="110" />
-        <el-table-column prop="time_diff" label="Diff" width="80" />
-        <el-table-column prop="attendance_type_name" label="Status" min-width="100">
+    <el-dialog v-model="recordsDialog" :title="`លម្អិត — ${selectedRow?.name}`" width="60%">
+      <el-table :data="selectedRow?.attendance_record || []" size="large" stripe>
+        <el-table-column prop="day_string" label="ថ្ងៃ" width="100" />
+        <el-table-column prop="type_string" label="ប្រភេទ" width="150" />
+        <el-table-column prop="check_time" label="ម៉ោងបានស្កែន" width="150" />
+        <el-table-column prop="scheduled_time" label="ម៉ោងត្រូវស្កែន" width="110" />
+        <el-table-column prop="time_diff" label="យឺត/មុនម៉ោង" width="150" />
+        <el-table-column prop="attendance_type_name" label="ស្ថានភាព" min-width="100">
           <template #default="{ row }">
             <el-tag size="small" :type="getAttendTypeTag(row.attendance_type)">
               {{ row.attendance_type_name || '—' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="In Zone" width="90" align="center">
+        <el-table-column label="ទីតាំងស្កែន" width="120" align="center">
           <template #default="{ row }">
-            <el-icon :color="row.inzone ? '#67c23a' : '#f56c6c'">
+            <el-icon size="large" :color="row.inzone ? '#67c23a' : '#f56c6c'">
               <component :is="row.inzone ? 'CircleCheckFilled' : 'CircleCloseFilled'" />
             </el-icon>
           </template>
         </el-table-column>
-        <el-table-column prop="reason" label="Reason" min-width="120" />
+        <el-table-column prop="reason" label="មូលហេតុ" min-width="120" />
       </el-table>
     </el-dialog>
   </div>
@@ -163,7 +162,7 @@ async function fetchAttendance() {
     if (filters.company_id) params.company_id = filters.company_id
     const res = await getAttendance(params)
     attendance.value = res.data.data || []
-    total.value = res.data.metadata?.total_count || 0
+    total.value = res.data.pagination?.totalCount || 0
   } catch { ElMessage.error('Failed to load attendance') }
   finally { loading.value = false }
 }
@@ -177,8 +176,15 @@ onMounted(fetchAttendance)
 </script>
 
 <style scoped>
-.checkin-card { border-radius: 12px; }
-.filter-card { border-radius: 12px; }
+.checkin-card { border-radius: 6px; }
+.filter-card { border-radius: 6px; }
 .card-title { font-weight: 600; font-size: 15px; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+:deep(.el-table__header-wrapper th) {
+  background-color: #4589ce !important;
+  color: #ffffff !important;
+}
+.detail-action {
+  padding: 10px 0;
+}
 </style>
