@@ -62,7 +62,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="សកម្មភាព" width="140" fixed="right">
+        <el-table-column label="សកម្មភាព" width="140">
           <template #default="{ row }">
             <el-button size="small" icon="Edit" circle @click="openEdit(row)" title="កែប្រែ" />
             <el-button size="small" :icon="row.is_active ? 'CircleClose' : 'CircleCheck'" circle

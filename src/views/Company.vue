@@ -21,7 +21,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="សកម្មភាព" width="100" fixed="right">
+        <el-table-column label="សកម្មភាព" width="100">
           <template #default="{ row }">
             <el-button size="small" icon="Edit" circle @click="openEdit(row)" />
           </template>

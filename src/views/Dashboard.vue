@@ -31,9 +31,9 @@
             <el-icon size="26" color="#67c23a"><Clock /></el-icon>
             <span>មេីលវត្តមាន</span>
           </div>
-          <div class="action-btn" @click="$router.push('/payroll')">
-            <el-icon size="26" color="#e6a23c"><Money /></el-icon>
-            <span>បេីកប្រាក់ខែ</span>
+          <div class="action-btn" @click="$router.push('/createattendance')">
+            <el-icon size="26" color="#e6a23c"><Camera /></el-icon>
+            <span>កត់ត្រាវត្តមាន</span>
           </div>
           <div class="action-btn" @click="$router.push('/company')">
             <el-icon size="26" color="#f56c6c"><OfficeBuilding /></el-icon>

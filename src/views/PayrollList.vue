@@ -33,7 +33,7 @@
       </template>
 
       <el-table :data="payrolls" v-loading="loading" stripe>
-        <el-table-column prop="user_name" label="ឈ្មោះបុគ្គលិក" min-width="130" />
+        <el-table-column prop="user_name" label="ឈ្មោះបុគ្គលិក" min-width="100" />
         <el-table-column label="ភេទ" width="80" align="center">
   <template #default="{ row }">
     <el-tag :type="row.user_gender === 1 ? 'primary' : 'danger'" size="small">
@@ -42,7 +42,7 @@
   </template>
 </el-table-column>
         <el-table-column prop="role_name" label="តួនាទី" width="110" />
-        <el-table-column prop="company_name" label="ក្រុមហ៊ុន" width="130" />
+        <el-table-column prop="company_name" label="ក្រុមហ៊ុន" width="160" />
         <el-table-column label="ប្រភេទប្រាក់ខែ" width="130" align="center">
           <template #default="{ row }">
             <el-tag :type="row.payroll_type === 1 ? 'primary' : 'warning'" size="small">

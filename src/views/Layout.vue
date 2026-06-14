@@ -56,18 +56,18 @@ const router = useRouter()
 const auth = useAuthStore()
 const collapsed = ref(false)
 const userName = computed(() => auth.user?.name || 'User')
+const canAddPayroll = computed(() => auth.permission?.some(p => p.name === 'add.payroll'))
+const nav = computed(() => [
+  { path: '/dashboard',   icon: 'Odometer',       label: 'សង្ខែបទិន្ន័យ',        short: 'ទិន្ន័យ' },
+  { path: '/company',     icon: 'OfficeBuilding',  label: 'ក្រុមហ៑ុន',            short: 'ក្រុមហ៑ុន' },
+  { path: '/users',       icon: 'User',            label: 'បុគ្គលិក',             short: 'បុគ្គលិក' },
+  { path: '/attendance',  icon: 'Clock',           label: 'វត្តមាន',              short: 'វត្តមាន' },
+  canAddPayroll.value && { path: '/payroll',    icon: 'Money', label: 'បេីកប្រាក់ខែ',      short: 'បេីកប្រាក់ខែ' },
+  { path: '/payrolllist', icon: 'Money',           label: 'ប្រាក់ខែ',    short: 'ប្រាក់ខែ' },
+  { path: '/profile',     icon: 'Setting',         label: 'ប្រវត្តរូប',           short: 'ប្រវត្តរូប' },
+].filter(Boolean))
 
-const nav = [
-  { path: '/dashboard',  icon: 'Odometer',      label: 'សង្ខែបទិន្ន័យ', short: 'ទិន្ន័យ' },
-  { path: '/company',    icon: 'OfficeBuilding', label: 'ក្រុមហ៑ុន',      short: 'ក្រុមហ៑ុន' },
-  { path: '/users',      icon: 'User',           label: 'បុគ្គលិក',       short: 'បុគ្គលិក' },
-  { path: '/attendance', icon: 'Clock',          label: 'វត្តមាន',         short: 'វត្តមាន' },
-  { path: '/payroll',    icon: 'Money',          label: 'បេីកប្រាក់ខែ',        short: 'បេីកប្រាក់ខែ' },
-  { path: '/payrolllist',    icon: 'Money',          label: 'របាយការណ៍ប្រាក់ខែ',        short: 'របាយការណ៍ប្រាក់ខែ' },
-  { path: '/profile',    icon: 'Setting',        label: 'ប្រវត្តរូប',      short: 'ប្រវត្តរូប' },
-]
-
-const pageTitle = computed(() => nav.find(n => n.path === route.path)?.label || 'HR')
+const pageTitle = computed(() => nav.value.find(n => n.path === route.path)?.label || 'HR')
 
 function handleCommand(cmd) {
   cmd === 'logout' ? (auth.logout(), router.push('/login')) : router.push('/profile')
