@@ -633,7 +633,14 @@ async function handleUpdate() {
     ElMessage.success('កែប្រែបុគ្គលិកបានជោគជ័យ')
     editDialog.value = false
     fetchUsers()
-  } catch (e) { ElMessage.error(e.response?.data?.message || 'Failed to update') }
+  } catch (e) {
+    ElMessage.error(
+    e.response?.data?.message ||
+    e.response?.data?.error ||
+    e.message ||
+    'Failed to update'
+  )
+  }
   finally { saving.value = false }
 }
 
