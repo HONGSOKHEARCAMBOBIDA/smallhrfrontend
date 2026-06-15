@@ -8,9 +8,15 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const auth = useAuthStore()
+  
+  // ✅ បន្ថែម x-api-key
+  config.headers['x-api-key'] = import.meta.env.API_KEY_SECRET || 'X7mK9qR2vLp8Nf4TzY6cHd3WsAj5BuEeG1rQn8MxKp7Vt2CyL9sDf4JhUwZk3NaRb'
+
+  // JWT Token (ប្រសិនបើមាន)
   if (auth.accessToken) {
     config.headers.Authorization = `Bearer ${auth.accessToken}`
   }
+
   return config
 })
 

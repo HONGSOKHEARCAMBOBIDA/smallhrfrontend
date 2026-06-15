@@ -28,6 +28,9 @@ body {
 .el-card,
 .el-dropdown,
 .el-date-picker,
+.el-input__inner::placeholder {
+  font-family: 'Siemreap', sans-serif;
+}
 .el-pagination {
   font-family: 'Siemreap', sans-serif !important;
 }

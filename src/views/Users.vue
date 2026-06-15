@@ -45,7 +45,6 @@
         <el-table-column prop="phone_hash" label="លេខទូរសព្ទ" width="130" />
         <el-table-column prop="role_name" label="តួនាទី" width="110" />
         <el-table-column prop="company_name" label="ក្រុមហ៑ុន" min-width="130" />
-          <el-table-column prop="qr_token" label="QR" min-width="130" />
         <el-table-column label="QR Token" min-width="150">
   <template #default="{ row }">
     <el-button type="primary" link @click="openQR(row.qr_token)">
@@ -340,7 +339,7 @@
   </template>
 </el-dialog>
 
-    <el-dialog v-model="qrDialog" title="ស្កែន QR" width="180px" center :show-close="false">
+<el-dialog v-model="qrDialog" title="ស្កែន QR" width="220px" center :show-close="false">
   <div class="qr-box">
     <img v-if="qrImage" :src="qrImage" />
   </div>
@@ -725,7 +724,18 @@ onMounted(() => {
   margin-top: 4px;
 }
 
+.qr-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  background: #ffffff;
+}
 
+.qr-box img {
+  width: 170px;
+  height: 170px;
+}
 
 @media (max-width: 768px) {
   .shift-dialog {

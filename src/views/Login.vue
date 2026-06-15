@@ -2,8 +2,6 @@
   <div class="login-page">
     <div class="login-card">
       <div class="login-logo">
-        <el-icon size="48" color="#409eff"><UserFilled /></el-icon>
-        <h1>គ្រប់គ្រងបុគ្គលិក</h1>
         <p>ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក និងធនធានមនុស្ស</p>
       </div>
 
@@ -76,7 +74,7 @@ async function startScanner() {
   try {
     await html5QrCode.start(
       { facingMode: 'environment' },           // rear camera
-      { fps: 10, qrbox: { width: 220, height: 220 } },
+      { fps: 10, qrbox: { width: 180, height: 180 } },
       (decodedText) => {
         stopScanner()
         handleQrLogin(decodedText)             // auto-login on scan
@@ -143,7 +141,7 @@ watch(activeTab, (tab) => {
 }
 
 .login-card {
-  border: 2px solid #102555;
+  border: 1px solid #215deb;
   border-radius: 6px;
   padding: 48px 40px;
   width: 420px;

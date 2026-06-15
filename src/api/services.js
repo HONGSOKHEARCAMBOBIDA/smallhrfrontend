@@ -26,6 +26,7 @@ export const updateShift = (data) => api.put('/edit.shift', data)
 // Attendance
 export const createAttendance = (data) => api.post('/add.attendance', data)
 export const getAttendance = (params) => api.get('/view.attendance', { params })
+export const getAttendanceDraft = (params) => api.get('/view.attendance.draft')
 
 // Payroll
 export const getPayrollDraft = (params) => api.get('/view.payroll.draft', { params })
