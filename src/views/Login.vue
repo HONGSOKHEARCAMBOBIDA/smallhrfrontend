@@ -22,27 +22,42 @@
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="ចូលតាមរយៈQR" name="qr">
-          <el-form @submit.prevent="handleQrLogin" label-position="top">
-            <el-form-item label="QR Token">
-              <el-input v-model="qrToken" placeholder="Enter QR token" size="large" />
-            </el-form-item>
-            <el-button type="primary" native-type="submit" size="large" :loading="loading" class="login-btn">
-              ចូលប្រព័ន្ធ
-            </el-button>
-          </el-form>
-        </el-tab-pane>
+<el-tab-pane label="ចូលតាមរយៈQR" name="qr">
+  <div class="qr-scanner-wrap">
+    <div v-if="!scanning && !loading" class="qr-start">
+      <p class="qr-hint">ចុចប៊ូតុងខាងក្រោម ដើម្បីស្កែន QR Code</p>
+      <el-button type="primary" size="large" class="login-btn" @click="startScanner">
+        <el-icon><Camera /></el-icon>&nbsp; បើកកាមេរ៉ាស្កែន
+      </el-button>
+    </div>
+
+    <!-- Scanner viewport -->
+    <div v-show="scanning" class="qr-viewport">
+      <div id="qr-reader"></div>
+      <p class="qr-hint">ដាក់ QR Code នៅក្នុងប្រអប់ស្កែន</p>
+      <el-button size="small" @click="stopScanner" style="margin-top:12px">
+        បោះបង់
+      </el-button>
+    </div>
+
+    <div v-if="loading" class="qr-loading">
+      <el-icon class="is-loading" size="32"><Loading /></el-icon>
+      <p>កំពុងចូលប្រព័ន្ធ...</p>
+    </div>
+  </div>
+</el-tab-pane>
       </el-tabs>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
 import { login, loginByQr } from '../api/services'
+import { Html5Qrcode } from 'html5-qrcode'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -50,6 +65,35 @@ const formRef = ref()
 const loading = ref(false)
 const activeTab = ref('phone')
 const qrToken = ref('')
+const scanning = ref(false)
+let html5QrCode = null
+
+async function startScanner() {
+  scanning.value = true
+  await nextTick() // wait for #qr-reader to mount
+
+  html5QrCode = new Html5Qrcode('qr-reader')
+  try {
+    await html5QrCode.start(
+      { facingMode: 'environment' },           // rear camera
+      { fps: 10, qrbox: { width: 220, height: 220 } },
+      (decodedText) => {
+        stopScanner()
+        handleQrLogin(decodedText)             // auto-login on scan
+      },
+      () => {}                                 // ignore per-frame errors
+    )
+  } catch (e) {
+    ElMessage.error('មិនអាចបើកកាមេរ៉ាបាន: ' + e)
+    scanning.value = false
+  }
+}
+
+function stopScanner() {
+  scanning.value = false
+  html5QrCode?.stop().catch(() => {})
+  html5QrCode = null
+}
 
 const form = reactive({ phone: '', password: '' })
 const rules = {
@@ -71,11 +115,11 @@ async function handleLogin() {
   }
 }
 
-async function handleQrLogin() {
-  if (!qrToken.value) return ElMessage.warning('Please enter QR token')
+async function handleQrLogin(token) {
+  if (!token) return ElMessage.warning('QR token មិនត្រឹមត្រូវ')
   loading.value = true
   try {
-    const res = await loginByQr({ qr_token: qrToken.value })
+    const res = await loginByQr({ qr_token: token })
     auth.setAuth(res.data.data)
     router.push('/dashboard')
   } catch (e) {
@@ -84,6 +128,10 @@ async function handleQrLogin() {
     loading.value = false
   }
 }
+onUnmounted(() => stopScanner())
+watch(activeTab, (tab) => {
+  if (tab !== 'qr') stopScanner()
+})
 </script>
 
 <style scoped>
@@ -130,9 +178,51 @@ async function handleQrLogin() {
   margin-bottom: 24px;
 }
 
+.qr-scanner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 16px;
+  min-height: 200px;
+}
+
+.qr-start, .qr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+.qr-viewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+#qr-reader {
+  width: 100% !important;
+  max-width: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #409eff;
+}
+
+/* Hide html5-qrcode's default UI clutter */
+#qr-reader__scan_region img,
+#qr-reader__dashboard { display: none !important; }
+
+.qr-hint {
+  color: #888;
+  font-size: 13px;
+  margin: 10px 0 0;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .login-page {
-    padding: 45px;
+    padding: 25px;
   }
 
   .login-card {

@@ -28,7 +28,7 @@
     </el-col>
     <el-col :span="8" style="text-align:right">
       <el-button
-        type="primary"
+        type="success"
         icon="Plus"
         @click="openCreate"
       >
@@ -45,6 +45,7 @@
         <el-table-column prop="phone_hash" label="លេខទូរសព្ទ" width="130" />
         <el-table-column prop="role_name" label="តួនាទី" width="110" />
         <el-table-column prop="company_name" label="ក្រុមហ៑ុន" min-width="130" />
+          <el-table-column prop="qr_token" label="QR" min-width="130" />
         <el-table-column label="QR Token" min-width="150">
   <template #default="{ row }">
     <el-button type="primary" link @click="openQR(row.qr_token)">
