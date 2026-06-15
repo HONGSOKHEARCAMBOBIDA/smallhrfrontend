@@ -32,3 +32,11 @@ export const getAttendanceDraft = (params) => api.get('/view.attendance.draft')
 export const getPayrollDraft = (params) => api.get('/view.payroll.draft', { params })
 export const createPayroll = (data) => api.post('/add.payroll', data)
 export const getPayroll = (params) => api.get('/view.payroll',{params})
+
+// Backup
+export const triggerBackup = () => api.post('add.backup')
+export const listBackups = () => api.get('view.backup')
+export const downloadBackup = (filename) => api.get('view.download.backup', { 
+  params: { file: filename },
+  responseType: 'blob'  // important — it's a file download
+})

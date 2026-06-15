@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://7ml45f42-8080.asse.devtunnels.ms',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
   timeout: 10000,
 })
 
@@ -11,7 +11,7 @@ api.interceptors.request.use((config) => {
   
   // ✅ បន្ថែម x-api-key
   config.headers['x-api-key'] = import.meta.env.API_KEY_SECRET || 'X7mK9qR2vLp8Nf4TzY6cHd3WsAj5BuEeG1rQn8MxKp7Vt2CyL9sDf4JhUwZk3NaRb'
-
+  config.headers['X-Admin-Token'] = import.meta.env.ADMIN_SECRET || 'X7mK9qR2vLp8Nf4TzY6cHd3WsAj5BuEeG1rQn8MxKp7Vt2CyL9sDf4JhUwZk3NaRb៣៩៨៩៩ឪឧ' 
   // JWT Token (ប្រសិនបើមាន)
   if (auth.accessToken) {
     config.headers.Authorization = `Bearer ${auth.accessToken}`

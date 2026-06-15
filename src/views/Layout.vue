@@ -65,6 +65,7 @@ const nav = computed(() => [
   canAddPayroll.value && { path: '/payroll',    icon: 'Money', label: 'បេីកប្រាក់ខែ',      short: 'បេីកប្រាក់ខែ' },
   { path: '/payrolllist', icon: 'Money',           label: 'ប្រាក់ខែ',    short: 'ប្រាក់ខែ' },
   { path: '/profile',     icon: 'Setting',         label: 'ប្រវត្តរូប',           short: 'ប្រវត្តរូប' },
+  { path: '/backup',     icon: 'Setting',         label: 'Backup',           short: 'Backup' },
 ].filter(Boolean))
 
 const pageTitle = computed(() => nav.value.find(n => n.path === route.path)?.label || 'HR')
