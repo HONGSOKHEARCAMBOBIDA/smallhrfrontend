@@ -4,7 +4,7 @@
       <div>
         <h1 class="bk-title">Database backup</h1>
       </div>
-      <el-button type="primary" :loading="triggering" :icon="Upload" @click="handleTriggerBackup">
+      <el-button v-if="canBackup" type="primary" :loading="triggering" :icon="Upload" @click="handleTriggerBackup">
         Back up now
       </el-button>
     </div>
@@ -81,8 +81,8 @@
             >
               Download
             </el-button> -->
-            <el-button type="success" :icon="Download" circle @click="handleDownload(row.filename)" />
-            <el-button type="danger" :icon="Delete" circle @click="handleDelete(row.filename)"/>
+            <el-button v-if="canDownloadBackup" type="success" :icon="Download" circle @click="handleDownload(row.filename)" />
+            <el-button v-if="canDeleteBackup" type="danger" :icon="Delete" circle @click="handleDelete(row.filename)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -95,12 +95,15 @@ import { ref, computed, onMounted } from 'vue'
 import { Upload, Download, Refresh,Delete } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import { triggerBackup, listBackups, downloadBackup,deleteBackup } from '../api/services'
-
+import { useAuthStore } from '../stores/auth'
 const backups = ref([])
 const loading = ref(false)
 const triggering = ref(false)
 const alert = ref({ type: 'success', message: '' })
-
+const auth = useAuthStore()
+const canBackup = computed(() => auth.permission?.some(p => p.name === 'add.backup'))
+const canDownloadBackup = computed(() => auth.permission?.some(p => p.name === 'view.download.backup'))
+const canDeleteBackup = computed(() => auth.permission?.some(p => p.name === 'delete.backup'))
 const showAlert = (type, message) => {
   alert.value = { type, message }
   setTimeout(() => { alert.value.message = '' }, 4000)
