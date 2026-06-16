@@ -1,92 +1,128 @@
 <template>
-  <div class="p-6">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">Database Backup</h1>
-      <button
-        @click="handleTriggerBackup"
-        :disabled="triggering"
-        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+  <div class="bk-wrap">
+    <div class="bk-header">
+      <div>
+        <h1 class="bk-title">Database backup</h1>
+      </div>
+      <el-button type="primary" :loading="triggering" :icon="Upload" @click="handleTriggerBackup">
+        Back up now
+      </el-button>
+    </div>
+
+    <el-alert
+      v-if="alert.message"
+      :title="alert.message"
+      :type="alert.type"
+      show-icon
+      closable
+      class="bk-alert"
+      @close="alert.message = ''"
+    />
+
+    <div class="bk-stats">
+      <div class="bk-stat">
+        <p class="bk-stat-label">Total backups</p>
+        <p class="bk-stat-value">{{ backups.length }}</p>
+        <p class="bk-stat-sub">Stored files</p>
+      </div>
+      <div class="bk-stat">
+        <p class="bk-stat-label">Latest backup</p>
+        <p class="bk-stat-value">{{ latestBackupLabel }}</p>
+        <p class="bk-stat-sub">Last run</p>
+      </div>
+      <div class="bk-stat">
+        <p class="bk-stat-label">Total size</p>
+        <p class="bk-stat-value">{{ totalSize }}</p>
+        <p class="bk-stat-sub">All files</p>
+      </div>
+    </div>
+
+    <div class="bk-card">
+      <div class="bk-card-header">
+        <span class="bk-card-title">
+          <span class="bk-status-dot" />
+          Backup files
+        </span>
+        <el-button link type="primary" :icon="Refresh" @click="loadBackups">Refresh</el-button>
+      </div>
+
+      <el-table
+        :data="backups"
+        v-loading="loading"
+        style="width: 100%"
+        stripe
       >
-        <span v-if="triggering">⏳ Backing up...</span>
-        <span v-else>🗄️ Backup Now</span>
-      </button>
-    </div>
+        <el-table-column label="Filename" min-width="260">
+          <template #default="{ row }">
+            <span class="bk-filename">{{ row.filename }}</span>
+          </template>
+        </el-table-column>
 
-    <!-- Success / Error alert -->
-    <div v-if="alert.message" :class="[
-      'mb-4 px-4 py-3 rounded-lg text-sm',
-      alert.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
-    ]">
-      {{ alert.message }}
-    </div>
+        <el-table-column label="Size" width="140">
+          <template #default="{ row }">
+            <el-tag type="warning" size="small" effect="plain">{{ formatSize(row.size_bytes) }}</el-tag>
+          </template>
+        </el-table-column>
 
-    <!-- Backup list -->
-    <div class="bg-white rounded-xl border border-gray-200">
-      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <span class="font-medium text-gray-700">Backup Files</span>
-        <button @click="loadBackups" class="text-sm text-blue-600 hover:underline">Refresh</button>
-      </div>
+        <el-table-column label="Created" width="160">
+          <template #default="{ row }">
+            <span class="bk-date">{{ formatRelative(row.created_at) }}</span>
+          </template>
+        </el-table-column>
 
-      <div v-if="loading" class="p-8 text-center text-gray-400">Loading...</div>
-
-      <div v-else-if="backups.length === 0" class="p-8 text-center text-gray-400">
-        No backups yet. Click "Backup Now" to create one.
-      </div>
-
-      <table v-else class="w-full text-sm">
-        <thead>
-          <tr class="text-left text-gray-500 border-b border-gray-100">
-            <th class="px-4 py-3 font-medium">Filename</th>
-            <th class="px-4 py-3 font-medium">Size</th>
-            <th class="px-4 py-3 font-medium">Created At</th>
-            <th class="px-4 py-3 font-medium">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="backup in backups"
-            :key="backup.filename"
-            class="border-b border-gray-50 hover:bg-gray-50"
-          >
-            <td class="px-4 py-3 font-mono text-xs text-gray-700">{{ backup.filename }}</td>
-            <td class="px-4 py-3 text-gray-600">{{ formatSize(backup.size_bytes) }}</td>
-            <td class="px-4 py-3 text-gray-600">{{ formatDate(backup.created_at) }}</td>
-            <td class="px-4 py-3">
-              <button
-                @click="handleDownload(backup.filename)"
-                class="text-blue-600 hover:underline text-xs"
-              >
-                Download
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <el-table-column label="Action" width="140" align="right">
+          <template #default="{ row }">
+            <!-- <el-button
+              link
+              type="primary"
+              size="large"
+              :icon="Download"
+              @click="handleDownload(row.filename)"
+            >
+              Download
+            </el-button> -->
+            <el-button type="success" :icon="Download" circle @click="handleDownload(row.filename)" />
+            <el-button type="danger" :icon="Delete" circle @click="handleDelete(row.filename)"/>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { triggerBackup, listBackups, downloadBackup } from '../api/services'
+import { ref, computed, onMounted } from 'vue'
+import { Upload, Download, Refresh,Delete } from '@element-plus/icons-vue'
+import { ElNotification } from 'element-plus'
+import { triggerBackup, listBackups, downloadBackup,deleteBackup } from '../api/services'
 
 const backups = ref([])
 const loading = ref(false)
 const triggering = ref(false)
-const alert = ref({ type: '', message: '' })
+const alert = ref({ type: 'success', message: '' })
 
 const showAlert = (type, message) => {
   alert.value = { type, message }
-  setTimeout(() => { alert.value = { type: '', message: '' } }, 4000)
+  setTimeout(() => { alert.value.message = '' }, 4000)
 }
+
+const latestBackupLabel = computed(() => {
+  if (!backups.value.length) return '—'
+  return formatRelative(backups.value[0].created_at)
+})
+
+const totalSize = computed(() => {
+  const total = backups.value.reduce((sum, b) => sum + (b.size_bytes ?? 0), 0)
+  return formatSize(total)
+})
 
 const loadBackups = async () => {
   loading.value = true
   try {
     const res = await listBackups()
     backups.value = res.data.backups ?? []
-  } catch (e) {
-    showAlert('error', 'Failed to load backups')
+  } catch {
+    ElNotification({ title: 'Warning', message: 'ទាញទិន្ន័យមិនបាន', type: 'warning' })
   } finally {
     loading.value = false
   }
@@ -95,15 +131,16 @@ const loadBackups = async () => {
 const handleTriggerBackup = async () => {
   triggering.value = true
   try {
-    const res = await triggerBackup()
-    showAlert('success', `Backup created: ${res.data.filename}`)
+    await triggerBackup()
+    ElNotification({ title: 'Success', message: 'Back Up ទិន្ន័យបានជោគជ័យ', type: 'success' })
     await loadBackups()
-  } catch (e) {
-    showAlert('error', e.response?.data?.error ?? 'Backup failed')
+  } catch {
+    ElNotification({ title: 'Error', message: 'Back Up មិនជោគជ័យ', type: 'error' })
   } finally {
     triggering.value = false
   }
 }
+
 
 const handleDownload = async (filename) => {
   try {
@@ -114,20 +151,165 @@ const handleDownload = async (filename) => {
     a.download = filename
     a.click()
     URL.revokeObjectURL(url)
-  } catch (e) {
-    showAlert('error', 'Download failed')
+  } catch {
+    ElNotification({ title: 'Error', message: 'Download fail', type: 'error' })
   }
 }
 
-const formatSize = (bytes) => {
-  if (bytes < 1024) return bytes + ' B'
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-  return (bytes / 1024 / 1024).toFixed(2) + ' MB'
+const handleDelete = async (filename) => {
+  try {
+    const res = await deleteBackup(filename)
+     ElNotification({ title: 'Success', message: 'Delete Back Up Success', type: 'success' })
+      await loadBackups()
+  } catch {
+    ElNotification({ title: 'Error', message: 'Download fail', type: 'error' })
+  }
 }
 
-const formatDate = (iso) => {
-  return new Date(iso).toLocaleString()
+
+const formatSize = (bytes) => {
+  if (!bytes) return '0 B'
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+  return (bytes / 1024 / 1024).toFixed(1) + ' MB'
+}
+
+const formatRelative = (iso) => {
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000)
+  if (diff < 60) return diff + 's ago'
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago'
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago'
+  return Math.floor(diff / 86400) + 'd ago'
 }
 
 onMounted(loadBackups)
 </script>
+
+<style scoped>
+.bk-wrap {
+  padding: 1.5rem;
+}
+
+.bk-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.bk-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  margin: 0 0 4px;
+}
+
+.bk-subtitle {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+  margin: 0;
+}
+
+.bk-alert {
+  margin-bottom: 1rem;
+}
+
+/* Stats */
+.bk-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.bk-stat {
+  border: 1px solid #409EFF;;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.bk-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--el-text-color-secondary);
+  margin: 0 0 4px;
+}
+
+.bk-stat-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.bk-stat-sub {
+  font-size: 12px;
+  color: var(--el-text-color-placeholder);
+  margin: 2px 0 0;
+}
+
+/* Card */
+.bk-card {
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bk-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  background: var(--el-fill-color-lighter);
+}
+
+.bk-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bk-status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--el-color-success);
+}
+
+/* Table overrides */
+.bk-filename {
+  font-family: monospace;
+  font-size: 16px;
+  color: var(--el-text-color-primary);
+}
+
+.bk-date {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+
+:deep(.el-table) {
+  border-radius: 0;
+}
+
+:deep(.el-table th.el-table__cell) {
+  background: var(--el-fill-color-lighter);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--el-text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+:deep(.el-table td.el-table__cell) {
+  padding: 10px 12px;
+}
+</style>

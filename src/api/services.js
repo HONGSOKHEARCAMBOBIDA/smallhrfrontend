@@ -40,3 +40,6 @@ export const downloadBackup = (filename) => api.get('view.download.backup', {
   params: { file: filename },
   responseType: 'blob'  // important — it's a file download
 })
+export const deleteBackup = (filename) => api.delete('delete.backup',{
+  params: {file: filename},
+})

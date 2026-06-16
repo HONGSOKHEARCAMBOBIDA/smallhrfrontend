@@ -57,6 +57,7 @@ const auth = useAuthStore()
 const collapsed = ref(false)
 const userName = computed(() => auth.user?.name || 'User')
 const canAddPayroll = computed(() => auth.permission?.some(p => p.name === 'add.payroll'))
+const canViewBackup = computed(() => auth.permission?.some(p => p.name === 'view.backup'))
 const nav = computed(() => [
   { path: '/dashboard',   icon: 'Odometer',       label: 'សង្ខែបទិន្ន័យ',        short: 'ទិន្ន័យ' },
   { path: '/company',     icon: 'OfficeBuilding',  label: 'ក្រុមហ៑ុន',            short: 'ក្រុមហ៑ុន' },
@@ -65,9 +66,8 @@ const nav = computed(() => [
   canAddPayroll.value && { path: '/payroll',    icon: 'Money', label: 'បេីកប្រាក់ខែ',      short: 'បេីកប្រាក់ខែ' },
   { path: '/payrolllist', icon: 'Money',           label: 'ប្រាក់ខែ',    short: 'ប្រាក់ខែ' },
   { path: '/profile',     icon: 'Setting',         label: 'ប្រវត្តរូប',           short: 'ប្រវត្តរូប' },
-  { path: '/backup',     icon: 'Setting',         label: 'Backup',           short: 'Backup' },
+  canViewBackup.value && { path: '/backup',     icon: 'Download',         label: 'Backup',           short: 'Backup' },
 ].filter(Boolean))
-
 const pageTitle = computed(() => nav.value.find(n => n.path === route.path)?.label || 'HR')
 
 function handleCommand(cmd) {
