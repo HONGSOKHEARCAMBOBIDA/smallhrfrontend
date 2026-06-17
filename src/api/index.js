@@ -25,11 +25,11 @@ api.interceptors.response.use(
   async (error) => {
     const auth = useAuthStore()
     const original = error.config
-    if (error.response?.status === 401 && !original._retry) {
+    if   (error.response?.status === 401 && !original._retry) {
       original._retry = true
       try {
         await auth.refresh()
-        original.headers.Authorization = `Bearer ${auth.accessToken}`
+      //  original.headers.Authorization = `Bearer ${auth.accessToken}`
         return api(original)
       } catch {
         auth.logout()

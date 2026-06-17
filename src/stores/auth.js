@@ -23,17 +23,21 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function refresh() {
     const res = await refreshToken({ refresh_token: refreshTokenVal.value })
-    accessToken.value = res.data.data.access_token
-    refreshTokenVal.value = res.data.data.refresh_token
-    localStorage.setItem('access_token', res.data.data.access_token)
-    localStorage.setItem('refresh_token', res.data.data.refresh_token)
-    localStorage.setItem('permissions', JSON.stringify(data.permissions))
-  }
+    const resData = res.data.data
 
+    accessToken.value = resData.access_token
+    refreshTokenVal.value = resData.refresh_token
+    permission.value = resData.permissions
+
+    localStorage.setItem('access_token', resData.access_token)
+    localStorage.setItem('refresh_token', resData.refresh_token)
+    localStorage.setItem('permissions', JSON.stringify(resData.permissions)) 
+  }
   function logout() {
     accessToken.value = ''
     refreshTokenVal.value = ''
     user.value = null
+    permission.value = null
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('user')
