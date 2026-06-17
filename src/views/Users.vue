@@ -246,14 +246,14 @@
 <el-dialog
   v-model="shiftsDialog"
   :title="`វេនធ្វើការ របស់ ${selectedUser?.name}`"
-  width="983px"
+  width="50%"
   class="shift-dialog"
   @closed="shiftsEditMode = false"
 >
   <div style="display:flex; justify-content:flex-end; margin-bottom:12px">
       <el-button
     icon="Plus"
-    size="small"
+    size="large"
     type="success"
     :disabled="selectedUser?.shift_response?.length >= 7"
     @click="startShiftCreate"
@@ -263,7 +263,7 @@
     <el-button
       v-if="!shiftsEditMode"
       icon="Edit"
-      size="small"
+      size="large"
       @click="startShiftEdit"
     >
       កែប្រែ
@@ -280,9 +280,9 @@
   >
     <el-table-column prop="day_name" label="ថ្ងៃ" width="100" />
 
-    <el-table-column label="ប្រភេទ" width="170">
+    <el-table-column label="ប្រភេទ" width="190">
       <template #default="{ row }">
-        <el-select v-if="shiftsEditMode" v-model="row.shift_type" size="small" style="width:100%" clearable>
+        <el-select v-if="shiftsEditMode" v-model="row.shift_type" size="large" style="width:100%" clearable>
           <el-option label="ធ្វេីការពេញម៉ោង" :value="1" />
           <el-option label="ធ្វេីការតែមួយព្រឹក"  :value="2" />
           <el-option label="ធ្វេីការតែមួយរសៀល"  :value="3" />
@@ -291,30 +291,30 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="ចូលវេន១" width="145">
+    <el-table-column label="ចូលវេន១" width="165">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_in1" size="small"   start="00:00" end="23:30"  />
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_in1" size="large"   start="00:00" end="23:30"  />
         <span v-else>{{ row.check_in1 || '—' }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column label="ចេញវេន១" width="145">
+    <el-table-column label="ចេញវេន១" width="165">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_out1" size="small" start="00:00" end="23:30"/>
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_out1" size="large" start="00:00" end="23:30"/>
         <span v-else>{{ row.check_out1 || '—' }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column label="ចូលវេន២" width="145">
+    <el-table-column label="ចូលវេន២" width="165">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_in2" size="small" start="00:00" end="23:30"/>
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_in2" size="large" start="00:00" end="23:30"/>
         <span v-else>{{ row.check_in2 || '—' }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column label="ចេញវេន២" width="145">
+    <el-table-column label="ចេញវេន២" width="165">
       <template #default="{ row }">
-        <el-time-select v-if="shiftsEditMode" v-model="row.check_out2" size="small" start="00:00" end="23:30"/>
+        <el-time-select v-if="shiftsEditMode" v-model="row.check_out2" size="large" start="00:00" end="23:30"/>
         <span v-else>{{ row.check_out2 || '—' }}</span>
       </template>
     </el-table-column>
@@ -331,8 +331,8 @@
 
   <template #footer>
     <template v-if="shiftsEditMode">
-      <el-button @click="cancelShiftEdit">បោះបង់</el-button>
-      <el-button type="primary" :loading="savingShifts" @click="handleShiftUpdate">
+      <el-button @click="cancelShiftEdit" size="large">បោះបង់</el-button>
+      <el-button type="primary" :loading="savingShifts" @click="handleShiftUpdate" size="large">
         រក្សាទុក
       </el-button>
     </template>
@@ -650,7 +650,11 @@ async function toggleStatus(row) {
     await toggleUserStatus(row.id)
     ElMessage.success('កែប្រែស្ថានភាពបានជោគជ័យ')
     fetchUsers()
-  } catch (e) { ElMessage.error('Failed') }
+  } catch (e) { 
+
+   ElMessage.error(e.response?.data?.message || e.message || 'Something went wrong, please try again')
+  
+  }
 }
 
 function openShifts(row) {
