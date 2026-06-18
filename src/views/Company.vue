@@ -60,15 +60,16 @@
           </el-form-item>
           <div class="form-row">
             <el-form-item label="Latitude" prop="latitude">
-              <el-input v-model.trim.number="form.latitude" placeholder="e.g. 11.5564" size="large" type="number" />
+              <el-input v-model.trim="form.latitude" placeholder="e.g. 11.5564" size="large" />
             </el-form-item>
             <el-form-item label="Longitude" prop="longitude">
-              <el-input v-model.trim.number="form.longitude" placeholder="e.g. 104.9282" size="large" type="number" />
+              <el-input v-model.trim="form.longitude" placeholder="e.g. 104.9282" size="large" />
             </el-form-item>
           </div>
           <div class="form-row">
             <el-form-item label="ចម្ងាយអាចស្កែនបាន (ម៉េត្រ)" prop="radius">
-              <el-input v-model.trim.number="form.radius" placeholder="e.g. 100" size="large" type="number"/>
+              <el-input v-model.trim="form.radius" placeholder="e.g. 100" size="large"/>
+  <el-input v-model.trim="form.radius" @input="form.radius = form.radius.replace(/\D/g,'')" placeholder="e.g. 100" size="large" />
             </el-form-item>
             <el-form-item label="អាចស្កែនក្រៅតំបន់បាន" prop="can_scan_outsize">
               <!-- <el-select v-model="form.can_scan_outsize" placeholder="អាចស្កែនក្រៅតំបន់បាន" size="large"
@@ -99,11 +100,11 @@
 
             </el-form-item>
             <el-form-item label="ពិន័យយឺត" prop="late_penalty">
-              <el-input v-model.number="form.late_penalty" placeholder="ប្រាក់ពិន័យពេលមកយឺត" size="large" type="number" />
+              <el-input v-model="form.late_penalty" placeholder="ប្រាក់ពិន័យពេលមកយឺត" size="large" />
             </el-form-item>
           </div>
           <el-form-item label="ពិន័យចេញមុនម៉ោង" prop="left_early_penalty">
-            <el-input v-model.number="form.left_early_penalty" placeholder="ប្រាក់ពិន័យពេលចេញមុនម៉ោង" size="large" type="number" />
+            <el-input v-model="form.left_early_penalty" placeholder="ប្រាក់ពិន័យពេលចេញមុនម៉ោង" size="large"  />
           </el-form-item>
 
           <el-divider />
