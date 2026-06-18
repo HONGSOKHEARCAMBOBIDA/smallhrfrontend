@@ -124,7 +124,23 @@
               <el-input v-model="createForm.base_salary" placeholder="e.g. 500" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+      <el-col :span="12">
+      <el-form-item label="ក្រុមហ៑ុន" prop="company_id">
+          <el-select
+            v-model="createForm.company_id"
+            placeholder="ជ្រើសក្រុមហ៑ុន"
+            clearable
+            
+          >
+            <el-option
+              v-for="company in companys"
+              :key="company.id"
+              :label="company.name"
+              :value="company.id"
+            />
+          </el-select>
+        </el-form-item>
+           
           </el-col>
         </el-row>
 
@@ -210,7 +226,7 @@
         </el-form-item>
       </el-col>
 
-      <el-col :xs="24">
+      <el-col :xs="24" :sm="12">
         <el-form-item label="តួនាទី" prop="role_id">
           <el-select
             v-model="editForm.role_id"
@@ -223,6 +239,23 @@
               :key="role.id"
               :label="role.display_name"
               :value="role.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+            <el-col :xs="24" :sm="12">
+        <el-form-item label="ក្រុនហ៑ុន" prop="company_id">
+          <el-select
+            v-model="editForm.company_id"
+            placeholder="ជ្រើសក្រុនហ៑ុន"
+            clearable
+            style="width:100%"
+          >
+            <el-option
+              v-for="company in companys"
+              :key="company.id"
+              :label="company.name"
+              :value="company.id"
             />
           </el-select>
         </el-form-item>
@@ -402,7 +435,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getUsers, createUser, updateUser, toggleUserStatus, getrole,updateShift,createShift } from '../api/services'
+import { getUsers, createUser, updateUser, toggleUserStatus, getrole,updateShift,createShift,getCompany } from '../api/services'
 import { Watch } from '@element-plus/icons-vue'
 import { watch } from 'vue'
 import { debounce } from 'lodash-es'
@@ -414,6 +447,7 @@ const qrDialog = ref(false)
 const qrImage = ref("")
 const users = ref([])
 const roles = ref([])
+const companys = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const page = ref(1)
@@ -523,8 +557,9 @@ const debouncedFetch = debounce(() => {
 
 watch(() => filters.name, debouncedFetch)
 const createForm = reactive({
+  company_id:null,
   name: '', phone_hash: '', role_id: null, gender: null,
-  base_salary: '', company_id: 0, shifts: []
+  base_salary: '', shifts: []
 })
 const createRules = {
   name: [{ required: true, message: 'Name is required' }],
@@ -549,7 +584,7 @@ const rules = {
   ]
 }
 
-const editForm = reactive({ name: '', phone_hash: '', gender: 1, base_salary: '', role_id: null })
+const editForm = reactive({ name: '', phone_hash: '', gender: 1, base_salary: '', role_id: null,company_id:null })
 
 function addShift() {
   createForm.shifts.push({ day: 1, shift_type: 1, check_in1: '', check_out1: '', check_in2: '', check_out2: '', is_dayoff: false })
@@ -579,6 +614,17 @@ async function fetchRole(){
   }
 }
 
+async function fetchCompany(){
+  loading.value = true
+  try {
+    const res = await getCompany()
+    companys.value = res.data.data || []
+  } catch { ElMessage.error('Failed to load employees') }
+  finally {
+    loading.value = false
+  }
+}
+
 function openCreate() {
     createForm.shifts = [
     { day: 1, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
@@ -589,7 +635,7 @@ function openCreate() {
     { day: 6, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false },
     { day: 7, shift_type: 1, check_in1: '07:00', check_out1: '11:30', check_in2: '13:30', check_out2: '17:00', is_dayoff: false  }, 
   ]
-  Object.assign(createForm, { name: '', phone_hash: '', role_id: null, gender: null, base_salary: '', company_id: 0 })
+  Object.assign(createForm, { name: '', phone_hash: '', role_id: null, gender: null, base_salary: '', company_id: null })
   createDialog.value = true
 }
 
@@ -622,7 +668,7 @@ async function handleCreate() {
 
 function openEdit(row) {
   editId.value = row.id
-  Object.assign(editForm, { name: row.name, phone_hash: row.phone_hash, gender: row.gender, base_salary: row.base_salary, role_id: row.role_id })
+  Object.assign(editForm, { name: row.name, phone_hash: row.phone_hash, gender: row.gender, base_salary: row.base_salary, role_id: row.role_id,company_id: row.company_id })
   editDialog.value = true
 }
 
@@ -700,6 +746,7 @@ async function handleShiftUpdate() {
 }
 
 onMounted(() => {
+  fetchCompany()
   fetchUsers()
   fetchRole()
 })
