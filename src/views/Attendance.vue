@@ -97,6 +97,18 @@
             </el-icon>
           </template>
         </el-table-column>
+<el-table-column label="មេីលទីតាំង" width="120" align="center">
+  <template #default="{ row }">
+    <el-icon
+      size="large"
+      :color="row.inzone ? '#67c23a' : '#f56c6c'"
+      style="cursor:pointer"
+      @click="openLocation(row)"
+    >
+      <LocationInformation />
+    </el-icon>
+  </template>
+</el-table-column>
         <el-table-column prop="reason" label="មូលហេតុ" min-width="120" />
       </el-table>
     </el-dialog>
@@ -107,7 +119,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { createAttendance, getAttendance } from '../api/services'
-
+import { LocationInformation } from '@element-plus/icons-vue'
 const attendance = ref([])
 const loading = ref(false)
 const checking = ref(false)
@@ -123,6 +135,14 @@ const attendForm = reactive({ latitude: '', longitude: '', reason: '' })
 function getAttendTypeTag(type) {
   const map = { 1: 'success', 2: 'info', 3: 'warning', 4: 'danger' }
   return map[type] || 'info'
+}
+
+function openLocation(row) {
+  if (!row.latitdude || !row.longitude) {
+    return ElMessage.warning('មិនមានទីតាំងស្កែន')
+  }
+  const url = `https://www.google.com/maps?q=${row.latitdude},${row.longitude}`
+  window.open(url, '_blank')
 }
 
 function getLocation() {

@@ -105,7 +105,7 @@ async function handleCheckIn() {
     // Refresh draft so the button updates to the next session
     await fetchDraft()
   } catch (e) {
-    ElMessage.error(e.response?.data?.message || 'Sorry Something went wrong')
+    ElMessage.error(e.response?.data?.error || 'Sorry Something went wrong')
   } finally {
     loading.value = false
   }

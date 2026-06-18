@@ -59,6 +59,9 @@
 
     <el-divider />
     <p class="section-label">Location</p>
+    <el-form-item label="Map Link" prop="map_link">
+      <el-input v-model="form.map_link" size="large"></el-input>
+    </el-form-item>
     <div class="form-row">
       <el-form-item label="Latitude" prop="latitude">
         <el-input v-model="form.latitude" placeholder="e.g. 11.5564" size="large"/>
@@ -161,6 +164,7 @@ const editId = ref(null)
 const formRef = ref()
 const auth = useAuthStore()
 const form = reactive({
+  map_link:'',
   name: '', latitude: '', longitude: '', radius: '', currency: '',
   late_penalty: '', left_early_penalty: '', bot_token: '', group_link: '',can_scan_outsize:null
 })
@@ -197,6 +201,7 @@ function openEdit(row) {
   isEdit.value = true
   editId.value = row.id
   Object.assign(form, {
+    map_link: '', 
     name: row.name || '', latitude: row.latitude || '', longitude: row.longitude || '',
     radius: row.radius || '', currency: row.currency || '',
     bot_token: row.bot_token || '', group_link: row.group_link || '',
