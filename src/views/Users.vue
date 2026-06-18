@@ -26,7 +26,23 @@
         />
       </el-select>
     </el-col>
-    <el-col :span="8" style="text-align:right">
+        <el-col :span="5">
+      <el-select
+        v-model="filters.company_id"
+        placeholder="ក្រុមហ៑ុន"
+        clearable
+        @change="fetchUsers"
+        style="width:100%"
+      >
+        <el-option
+          v-for="company in companys"
+          :key="company.id"
+          :label="company.name"
+          :value="company.id"
+        />
+      </el-select>
+    </el-col>
+    <el-col :span="3" style="text-align:right">
       <el-button
         type="success"
         icon="Plus"
@@ -40,6 +56,7 @@
 
     <el-card class="table-card" style="margin-top:16px">
       <el-table :data="users" v-loading="loading" stripe row-key="id">
+         <el-table-column type="index" label="ល.រ" width="70" />
         <el-table-column prop="name" label="ឈ្មោះ" min-width="140" />
         <el-table-column prop="gender_string" label="ភេទ" width="90" />
         <el-table-column prop="phone_hash" label="លេខទូរសព្ទ" width="130" />
@@ -63,7 +80,7 @@
           </template>
         </el-table-column>
         <el-table-column label="សកម្មភាព" width="140">
-          <template #default="{ row }">
+          <template #default="{ row }" v-if="canedit">
             <el-button size="small" icon="Edit" circle @click="openEdit(row)" title="កែប្រែ" />
             <el-button size="small" :icon="row.is_active ? 'CircleClose' : 'CircleCheck'" circle
               :type="row.is_active ? 'danger' : 'success'" @click="toggleStatus(row)" title="បិទ/បេីក" />
@@ -433,14 +450,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getUsers, createUser, updateUser, toggleUserStatus, getrole,updateShift,createShift,getCompany } from '../api/services'
 import { Watch } from '@element-plus/icons-vue'
 import { watch } from 'vue'
 import { debounce } from 'lodash-es'
 import QRCode from "qrcode"
-
+import { ElNotification } from 'element-plus'
+import { useAuthStore } from '../stores/auth'
 const shiftsCreateDialog = ref(false)
 const newShifts = ref([])
 const qrDialog = ref(false)
@@ -453,7 +471,7 @@ const saving = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const filters = reactive({ name: '', role_id: null })
+const filters = reactive({ name: '', role_id: null,company_id: null })
 const createDialog = ref(false)
 const editDialog = ref(false)
 const shiftsDialog = ref(false)
@@ -465,7 +483,8 @@ const day = ref(1)
 const shiftsEditMode = ref(false)
 const savingShifts = ref(false)
 const editableShifts = ref([])
-
+const auth = useAuthStore()
+const canedit = computed(()=> auth.permission?.some(p => p.name === 'edit.user'))
 const days = [
   'ចន្ទ',
   'អង្គារ',
@@ -596,6 +615,7 @@ async function fetchUsers() {
     const params = { page: page.value, page_size: pageSize.value }
     if (filters.name) params.name = filters.name
     if (filters.role_id) params.role_id = filters.role_id
+    if(filters.company_id) params.company_id = filters.company_id
     const res = await getUsers(params)
     users.value = res.data.data || []
     total.value = res.data.pagination?.totalCount || 0
@@ -698,7 +718,13 @@ async function toggleStatus(row) {
     fetchUsers()
   } catch (e) { 
 
-   ElMessage.error(e.response?.data?.message || e.message || 'Something went wrong, please try again')
+
+     ElNotification.error({
+    title: 'Error',
+    message: e.response?.data?.error,
+    offset: 100,
+  })
+
   
   }
 }

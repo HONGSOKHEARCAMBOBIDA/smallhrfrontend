@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard">
     <!-- Stats row: 4-col on desktop, 2-col on mobile -->
-    <div class="stat-grid">
+    <!-- <div class="stat-grid">
       <div
         class="stat-card"
         v-for="stat in stats"
@@ -16,7 +16,7 @@
           <div class="stat-label">{{ stat.label }}</div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Two-col on desktop, stacked on mobile -->
     <div class="dash-grid">
@@ -80,7 +80,7 @@ onMounted(async () => {
   try {
     const today = new Date().toISOString().split('T')[0]
     const [usersRes, attendRes] = await Promise.allSettled([
-      countuser({}),
+     // countuser({}),
       getAttendance({ page: 1, page_size: 5, check_date: today }),
     ])
     if (usersRes.status === 'fulfilled')

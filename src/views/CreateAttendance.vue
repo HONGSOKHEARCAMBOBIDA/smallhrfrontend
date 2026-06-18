@@ -10,8 +10,13 @@
     </template>
 
     <el-form :model="attendForm">
-      <el-form-item label="មូលហេតុ">
-        <el-input type="textarea" v-model="attendForm.reason" placeholder="បញ្ចូលមូលហេតុ" style="width: 100%;" />
+      <el-form-item label="មូលហេតុ" :required="reasonRequired">
+        <el-input
+          type="textarea"
+          v-model="attendForm.reason"
+          :placeholder="reasonPlaceholder"
+          style="width: 100%;"
+        />
       </el-form-item>
 
       <!-- Draft info row -->
@@ -22,18 +27,27 @@
         </div>
       </el-form-item>
 
+      <!-- Late / early-leave warning -->
+      <el-form-item v-if="reasonRequired">
+        <el-alert
+          :title="isLate ? 'អ្នកមកយឺត សូមបញ្ចូលមូលហេតុ' : 'អ្នកចេញមុនម៉ោង សូមបញ្ចូលមូលហេតុ'"
+          type="warning"
+          show-icon
+          :closable="false"
+        />
+      </el-form-item>
+
       <el-form-item>
         <el-button
-          :type="draft?.type === 1 || draft?.type === 3 ? 'primary' : 'warning'"
+          :type="isCheckInType ? 'primary' : 'warning'"
           :loading="loading || draftLoading"
-          :disabled="!draft"
+          :disabled="isButtonDisabled"
           @click="handleCheckIn"
           size="large"
           style="width: 100%; height: 80px;"
         >
           <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
             <div style="padding-top: 1px; padding-bottom: 10px; padding-left: 16px; padding-right: 16px;">
-              <!-- Show type label from draft, fallback while loading -->
               <span style="font-size: 22px;">
                 {{ draftLoading ? 'កំពុងផ្ទុក...' : (draft?.type_string ?? 'ចុះវត្តមាន') }}
               </span>
@@ -50,18 +64,50 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { createAttendance, getAttendanceDraft } from '../api/services'
 
+const now = ref(new Date())
 const currentTime = ref('')
 const loading = ref(false)
 const attendForm = reactive({ latitude: '', longitude: '', reason: '' })
 
-// --- Draft state ---
-const draft = ref(null)       // { type, type_string, scheduled_time }
+const draft = ref(null)       
 const draftLoading = ref(false)
 const draftError = ref('')
+
+const isCheckInType = computed(() => draft.value?.type === 1 || draft.value?.type === 3)
+const isCheckOutType = computed(() => draft.value?.type === 2 || draft.value?.type === 4)
+
+const scheduledDateTime = computed(() => {
+  const t = draft.value?.scheduled_time
+  if (!t) return null
+  const [h, m, s] = t.split(':').map(Number)
+  const d = new Date()
+  d.setHours(h || 0, m || 0, s || 0, 0)
+  return d
+})
+
+const isLate = computed(() =>
+  isCheckInType.value && scheduledDateTime.value && now.value > scheduledDateTime.value
+)
+
+const isEarlyLeave = computed(() =>
+  isCheckOutType.value && scheduledDateTime.value && now.value < scheduledDateTime.value
+)
+
+const reasonRequired = computed(() => isLate.value || isEarlyLeave.value)
+
+const reasonPlaceholder = computed(() => {
+  if (isLate.value) return 'សូមបញ្ចូលមូលហេតុមកយឺត'
+  if (isEarlyLeave.value) return 'សូមបញ្ចូលមូលហេតុចេញមុនម៉ោង'
+  return 'បញ្ចូលមូលហេតុ'
+})
+
+const reasonMissing = computed(() => reasonRequired.value && !attendForm.reason.trim())
+
+const isButtonDisabled = computed(() => !draft.value || reasonMissing.value)
 
 async function fetchDraft() {
   draftLoading.value = true
@@ -89,19 +135,21 @@ function getLocation() {
 }
 
 function updateTime() {
-  currentTime.value = new Date().toLocaleTimeString('km-KH', {
+  now.value = new Date()
+  currentTime.value = now.value.toLocaleTimeString('km-KH', {
     hour: '2-digit', minute: '2-digit', second: '2-digit'
   })
 }
 
 async function handleCheckIn() {
-  if (!attendForm.latitude || !attendForm.longitude) {
-    return ElMessage.warning('ចាប់ទីតាំងមិនបាន!!')
+  if (reasonMissing.value) {
+    return ElMessage.warning('សូមបញ្ចូលមូលហេតុជាមុនសិន')
   }
   loading.value = true
   try {
     await createAttendance(attendForm)
     ElMessage.success('ចុះវត្តមានបានជោគជ័យ')
+    attendForm.reason = ''
     // Refresh draft so the button updates to the next session
     await fetchDraft()
   } catch (e) {

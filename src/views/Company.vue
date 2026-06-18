@@ -6,7 +6,7 @@
 
     <el-card class="table-card">
       <el-table :data="companies" v-loading="loading" stripe>
-        <el-table-column prop="id" label="ល.រ" width="70" />
+        <el-table-column type="index" label="ល.រ" width="70" />
         <el-table-column prop="name" label="ឈ្មោះ" min-width="110" />
         <el-table-column prop="user_count" label="បុគ្គលិកសរុប" min-width="110" />
         <el-table-column prop="latitude" label="Latitude" width="120" />
@@ -101,8 +101,8 @@
     </el-form-item>
 
     <el-divider />
-    <p class="section-label">Telegram</p>
-    <div class="form-row">
+    <p class="section-label" v-show="!isEdit">Telegram</p>
+    <div class="form-row" v-show="!isEdit">
       <el-form-item label="Bot Token">
         <el-input :disabled="isEdit" v-model="form.bot_token" placeholder="Telegram bot token" size="large"/>
       </el-form-item>
