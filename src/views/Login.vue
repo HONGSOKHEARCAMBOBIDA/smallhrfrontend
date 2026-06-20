@@ -14,9 +14,12 @@
             <el-form-item label="ពាក្យសម្ងាត់" prop="password">
               <el-input v-model="form.password" type="password" placeholder="បញ្ចូលពាក្យសម្ងាត់" prefix-icon="Lock" size="large" show-password />
             </el-form-item>
-            <el-button type="primary" native-type="submit" size="large" :loading="loading" class="login-btn">
+            <!-- <el-button type="primary" native-type="submit" size="large" :loading="loading" class="login-btn">
               ចូលប្រព័ន្ធ
-            </el-button>
+            </el-button> -->
+            <AppButton  native-type="submit" :loading="loading" type="success" block="false">
+               ចូលប្រព័ន្ធ
+            </AppButton>
           </el-form>
         </el-tab-pane>
 
@@ -56,7 +59,7 @@ import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
 import { login, loginByQr } from '../api/services'
 import { Html5Qrcode } from 'html5-qrcode'
-
+import AppButton from '../../components/AppButton.vue'
 const router = useRouter()
 const auth = useAuthStore()
 const formRef = ref()
