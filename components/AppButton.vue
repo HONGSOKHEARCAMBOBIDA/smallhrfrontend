@@ -4,7 +4,7 @@
     :type="type"
     :size="size"
     :loading="loading"
-    ::disabled="disabled || loading"
+    :disabled="disabled || loading" 
     :native-type="nativeType"
     class="app-button"
     :class="{ 'app-button--block': block }"
@@ -22,7 +22,7 @@ defineProps({
   loading: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   nativeType: { type: String, default: 'button' },   // 'submit' for form buttons
-  block: { type: Boolean, default: true },           // full width by default
+  block: { type: Boolean, default: false },           // full width by default
   icon: { type: [String, Object], default: null },
 })
 defineEmits(['click'])

@@ -112,9 +112,14 @@ const isMobile = computed(() => windowWidth.value <= props.mobileBreakpoint);
 .app-table-cards {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
- 
+
+:deep(.el-table__header-wrapper th) {
+  background-color: #4589ce !important;
+  color: #ffffff !important;
+}
+
 .app-table-card {
   border: 1px solid var(--el-border-color);
   border-radius: 8px;
@@ -135,7 +140,7 @@ const isMobile = computed(() => windowWidth.value <= props.mobileBreakpoint);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: 20px;
   padding: 6px 0;
   border-bottom: 1px dashed var(--el-border-color-lighter);
   font-size: 13px;

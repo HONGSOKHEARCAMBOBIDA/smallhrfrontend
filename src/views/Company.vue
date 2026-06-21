@@ -2,12 +2,12 @@
   <div>
     <div class="page-header">
       <AppButton
-      v-if="canAddCompany"
-      type="primary"
-      @click="openCreate"
-      :block="false"
+        v-if="canAddCompany"
+        type="primary"
+        @click="openCreate"
+        :block="false"
       >
-      បន្ថែមក្រុមហ៑ុន
+        បន្ថែមក្រុមហ៑ុន
       </AppButton>
     </div>
 
@@ -65,17 +65,23 @@
         </template>
       </AppTable>
     </el-card>
-
-    <!-- Create/Edit Dialog -->
-    <el-dialog
+    <AppDialog
       v-model="dialogVisible"
       :title="isEdit ? 'កែប្រែក្រុមហ៊ុន' : 'បន្ថែមក្រុមហ៊ុន'"
       width="640px"
-      destroy-on-close
     >
       <el-form :model="form" :rules="rules" ref="formRef" label-position="top">
-        <el-tabs v-model="activeTab">
-          <el-tab-pane label="ព័ត៌មានទូទៅ" name="basic">
+        <AppTabs
+          v-model="activeTab"
+          :tabs="[
+            { name: 'general', label: 'ព័ត៌មានទូទៅ' },
+            { name: 'penalty', label: 'ប្រាក់ពិន័យ' },
+            { name: 'telegram', label: 'Telegram' },
+          ]"
+          tab-position="top"
+          stretch="true"
+        >
+          <template #general>
             <el-form-item label="ឈ្មោះក្រុមហ៊ុន" prop="name">
               <el-input
                 v-model.trim="form.name"
@@ -116,7 +122,7 @@
               </el-form-item>
             </div>
 
-            <div class="form-row">
+            <div class="">
               <el-form-item label="ចម្ងាយអាចស្កែនបាន (ម៉េត្រ)" prop="radius">
                 <el-input
                   v-model.trim="form.radius"
@@ -131,9 +137,8 @@
                 </el-radio-group>
               </el-form-item>
             </div>
-          </el-tab-pane>
-
-          <el-tab-pane label="ប្រាក់ពិន័យ" name="penalty">
+          </template>
+          <template #penalty>
             <div class="form-row">
               <el-form-item label="ពិន័យពេលមកយឺត" prop="late_penalty">
                 <el-input
@@ -154,10 +159,8 @@
                 </el-input>
               </el-form-item>
             </div>
-          </el-tab-pane>
-
-          <!-- TELEGRAM (only on create) -->
-          <el-tab-pane label="Telegram" name="telegram" v-if="!isEdit">
+          </template>
+          <template #telegram>
             <el-form-item label="Bot Token" prop="bot_token">
               <el-input
                 v-model="form.bot_token"
@@ -172,32 +175,26 @@
                 size="large"
               />
             </el-form-item>
-          </el-tab-pane>
-        </el-tabs>
+          </template>
+        </AppTabs>
       </el-form>
-
       <template #footer>
-        <el-button @click="dialogVisible = false" size="large"
-          >បោះបង់</el-button
-        >
-        <el-button
+        <AppButton @click="dialogVisible = false" size="large" :block="false" type="warning">
+          បោះបង់
+        </AppButton>
+        <AppButton
+          @click="handleSave"
           type="primary"
           :loading="saving"
-          @click="handleSave"
           size="large"
+          :block="false"
         >
-          {{ isEdit ? "រក្សាទុក" : "បង្កើត" }}
-          <el-icon class="el-icon--right"><Upload /></el-icon>
-        </el-button>
+          {{ isEdit ? "កែប្រែ" : "បង្កើត" }}
+        </AppButton>
       </template>
-    </el-dialog>
+    </AppDialog>
 
-    <el-dialog
-      v-model="dialogTelegramVisible"
-      title="កែប្រែ"
-      width="600px"
-      destroy-on-close
-    >
+    <AppDialog v-model="dialogTelegramVisible" title="កែប្រែ" width="600px">
       <el-form :model="form" :rules="rules" ref="formRef" label-position="top">
         <el-divider />
         <p class="section-label">Telegram</p>
@@ -218,20 +215,22 @@
           </el-form-item>
         </div>
       </el-form>
+
       <template #footer>
-        <el-button @click="dialogTelegramVisible = false" size="large"
-          >ថតក្រោយ</el-button
-        >
-        <el-button
+        <AppButton @click="dialogTelegramVisible = false" size="large" :block="false">
+          ថតក្រោយ
+        </AppButton>
+        <AppButton
           type="primary"
           :loading="saving"
           @click="handleUpdateTelegram"
           size="large"
+          :block="false"
         >
           កែប្រែ
-        </el-button>
+        </AppButton>
       </template>
-    </el-dialog>
+    </AppDialog>
   </div>
 </template>
 
@@ -247,6 +246,8 @@ import {
 import { useAuthStore } from "../stores/auth";
 import AppTable from "../../components/AppTable.vue";
 import AppButton from "../../components/AppButton.vue";
+import AppDialog from "../../components/AppDialog.vue";
+import AppTabs from "../../components/AppTabs.vue";
 const companies = ref([]);
 const loading = ref(false);
 const saving = ref(false);
@@ -260,7 +261,7 @@ const dialogTelegramVisible = ref(false);
 const editId = ref(null);
 const formRef = ref();
 const auth = useAuthStore();
-
+const activeTab = ref("general");
 const form = reactive({
   map_link: "",
   name: "",
@@ -281,7 +282,7 @@ const canAddCompany = computed(() =>
 const canEditCompany = computed(() =>
   auth.permission?.some((p) => p.name === "edit.company"),
 );
-const activeTab = ref("basic");
+
 const rules = {
   name: [{ required: true, message: "Company name is required" }],
   radius: [{ required: true, message: "Radius is required" }],
@@ -305,7 +306,7 @@ async function fetchCompanies() {
       page_size: pageSize.value,
     });
     companies.value = res.data.data || [];
-    total.value = res.data.metadata?.total_count || 0;
+    total.value = res.data.pagination?.totalCount || 0;
   } catch (e) {
     ElMessage.error(e.response?.data?.error);
   } finally {
