@@ -1,83 +1,69 @@
 <template>
   <div>
     <div class="page-header">
-      <el-button
-        v-if="canAddCompany"
-        type="primary"
-        icon="Plus"
-        @click="openCreate"
-        >បន្ថែមក្រុមហ៑ុន</el-button
+      <AppButton
+      v-if="canAddCompany"
+      type="primary"
+      @click="openCreate"
+      :block="false"
       >
+      បន្ថែមក្រុមហ៑ុន
+      </AppButton>
     </div>
 
     <el-card class="table-card">
-      <el-table :data="companies" v-loading="loading" stripe border>
-        <el-table-column type="index" label="ល.រ" width="70" />
-        <el-table-column prop="name" label="ឈ្មោះ" min-width="110" />
-        <el-table-column
-          prop="user_count"
-          label="បុគ្គលិកសរុប"
-          min-width="110"
-        />
-        <el-table-column prop="latitude" label="Latitude" width="120" />
-        <el-table-column prop="longitude" label="Longitude" width="120" />
-        <el-table-column prop="radius" label="ចម្ងាយអាចស្កែន (m)" width="150" />
-        <el-table-column prop="currency" label="រូបិយប័ណ្ណ" width="100" />
-        <el-table-column prop="late_penalty" label="ពិន័យយឺត" width="120" />
-        <el-table-column
-          prop="left_early_penalty"
-          label="ពិន័យចេញមុនម៉ោង"
-          width="150"
-        />
-        <el-table-column
-          prop="can_scan_outsize"
-          label="អាចស្កែនក្រៅតំបន់"
-          width="150"
-        >
-          <template #default="{ row }">
-            <el-tag :type="row.can_scan_outsize ? 'success' : 'danger'">
-              {{ row.can_scan_outsize ? "បាន" : "មិនបាន" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="ស្ថានភាព" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.is_active ? 'success' : 'danger'" size="small">
-              {{ row.is_active ? "Active" : "Inactive" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="សកម្មភាព" width="100">
-          <template #default="{ row }">
-            <el-button
-              v-if="canEditCompany"
-              size="small"
-              icon="Edit"
-              type="warning"
-              circle
-              @click="openEdit(row)"
-            />
-            <el-button
-              v-if="canEditCompany"
-              size="small"
-              icon="Promotion"
-              type="primary"
-              circle
-              @click="openEditTelegram(row)"
-            />
-          </template>
-        </el-table-column>
-      </el-table>
+      <AppTable
+        :data="companies"
+        :loading="loading"
+        show-index
+        v-model:current-page="page"
+        v-model:page-size="pageSize"
+        :total="total"
+        @page-change="fetchCompanies"
+        :columns="[
+          { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
+          { prop: 'user_count', label: 'បុគ្គលិកសរុប', minWidth: 110 },
+          { prop: 'latitude', label: 'Latitude', width: 120 },
+          { prop: 'longitude', label: 'Longitude', width: 120 },
+          { prop: 'radius', label: 'ចម្ងាយអាចស្កែន (m)', width: 150 },
+          { prop: 'currency', label: 'រូបិយប័ណ្ណ', width: 100 },
+          { prop: 'late_penalty', label: 'ពិន័យយឺត', width: 120 },
+          { prop: 'left_early_penalty', label: 'ពិន័យចេញមុនម៉ោង', width: 150 },
+          { label: 'អាចស្កែនក្រៅតំបន់', slot: 'outsize', width: 150 },
+          { label: 'ស្ថានភាព', slot: 'status', width: 100 },
+        ]"
+      >
+        <template #outsize="{ row }">
+          <el-tag :type="row.can_scan_outsize ? 'success' : 'danger'">
+            {{ row.can_scan_outsize ? "បាន" : "មិនបាន" }}
+          </el-tag>
+        </template>
 
-      <div class="pagination-wrap">
-        <el-pagination
-          v-model:current-page="page"
-          v-model:page-size="pageSize"
-          :total="total"
-          layout="total, prev, pager, next"
-          @change="fetchCompanies"
-        />
-      </div>
+        <template #status="{ row }">
+          <el-tag :type="row.is_active ? 'success' : 'danger'" size="small">
+            {{ row.is_active ? "Active" : "Inactive" }}
+          </el-tag>
+        </template>
+
+        <template #actions="{ row }">
+          <el-button
+            v-if="canEditCompany"
+            size="small"
+            icon="Edit"
+            type="warning"
+            circle
+            @click="openEdit(row)"
+          />
+          <el-button
+            v-if="canEditCompany"
+            size="small"
+            icon="Promotion"
+            type="primary"
+            circle
+            @click="openEditTelegram(row)"
+          />
+        </template>
+      </AppTable>
     </el-card>
 
     <!-- Create/Edit Dialog -->
@@ -259,7 +245,8 @@ import {
   updateTelegram,
 } from "../api/services";
 import { useAuthStore } from "../stores/auth";
-
+import AppTable from "../../components/AppTable.vue";
+import AppButton from "../../components/AppButton.vue";
 const companies = ref([]);
 const loading = ref(false);
 const saving = ref(false);
@@ -329,7 +316,7 @@ async function fetchCompanies() {
 function openCreate() {
   isEdit.value = false;
   Object.keys(form).forEach((k) => (form[k] = ""));
-  form.can_scan_outsize = null; // ← add this
+  form.can_scan_outsize = null;
   dialogVisible.value = true;
 }
 
@@ -394,7 +381,6 @@ async function handleUpdateTelegram() {
   saving.value = true;
   try {
     if (isEditTelegram.value) {
-      // Send only non-empty fields as nullable update
       const payload = {};
       Object.entries(form).forEach(([k, v]) => {
         if (v !== "") payload[k] = v;
@@ -425,17 +411,6 @@ onMounted(fetchCompanies);
   border-radius: 6px;
 }
 
-.pagination-wrap {
-  margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-:deep(.el-table__header-wrapper th) {
-  background-color: #4589ce !important;
-  color: #ffffff !important;
-}
-
 .section-label {
   font-size: 11px;
   font-weight: 600;
@@ -443,16 +418,6 @@ onMounted(fetchCompanies);
   text-transform: uppercase;
   color: var(--el-text-color-secondary);
   margin-bottom: 12px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px;
-}
-
-.form-row .el-form-item {
-  margin-bottom: 8px;
 }
 
 .form-row {
