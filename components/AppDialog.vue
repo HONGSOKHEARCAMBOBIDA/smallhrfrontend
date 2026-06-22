@@ -130,8 +130,4 @@ onUnmounted(() => {
   max-height: none;
 }
 
-
-
-
-
 </style>

@@ -28,18 +28,24 @@
     </el-card> -->
 
     <!-- Filters -->
-    <el-card class="filter-card" style="margin-top: 16px">
-      <el-row :gutter="12">
-        <el-col :span="5">
-          <el-input
+     <AppFilterBar
+     :fields="[
+      {slot: 'name',span: 10},
+      {slot: 'date',span: 6}
+     ]"
+     :action-span="2"
+     >
+    <template #name>
+             <el-input
             v-model="filters.name"
             placeholder="ស្វែងរក"
             prefix-icon="Search"
             clearable
             @change="fetchAttendance"
-          />
-        </el-col>
-        <el-col :span="4">
+            size="large"
+          />   
+    </template>
+    <template #date>
           <el-date-picker
             v-model="filters.check_date"
             type="date"
@@ -48,41 +54,46 @@
             clearable
             @change="fetchAttendance"
             style="width: 100%"
+            size="large"
           />
-        </el-col>
-        <el-col :span="3">
-          <el-button type="primary" icon="Search" @click="fetchAttendance"
-            >Search</el-button
-          >
-        </el-col>
-      </el-row>
-    </el-card>
+    </template>
+    <template #actions>
+      <AppButton type="primary" @click="fetchAttendance">
+        ស្វែងរក
+      </AppButton>
+    </template>
+     </AppFilterBar>
 
-    <!-- Attendance Table -->
-    <el-card style="margin-top: 16px; border-radius: 6px">
-      <el-table :data="attendance" v-loading="loading" stripe>
-        <el-table-column prop="name" label="ឈ្មោះ" min-width="130" />
-        <el-table-column prop="gender_string" label="ភេទ" width="90" />
-        <el-table-column prop="role_name" label="តួនាទី" width="110" />
-        <el-table-column
-          prop="company_name"
-          label="ក្រុមហ៑ុន"
-          min-width="130"
-        />
-        <el-table-column prop="check_date" label="ថ្ងៃស្កែន" width="120" />
-        <el-table-column label="ស្ថានភាព" width="110">
-          <template #default="{ row }">
-            <el-tag
+<el-card>
+  <AppTable
+:data="attendance"
+:loading="loading"
+show-index
+        v-model:current-page="page"
+        v-model:page-size="pageSize"
+        :total="total"
+        @page-change="fetchAttendance"
+        :columns="[
+          {prop: 'name',label: 'ឈ្មោះ',minWidth: 110},
+          {prop: 'gender_string',label: 'ភេទ',minWidth: 90},
+          {prop: 'role_name',label: 'តួនាទី',minWidth: 110},
+          {prop: 'company_name',label: 'ក្រុមហ៑ុន',minWidth: 130},
+          {prop: 'check_date',label: 'ថ្ងៃស្កែន',minWidth: 120},
+          {label: 'ស្ថានភាព',slot: 'status',width: 100}
+
+        ]"
+>
+<template #status="{row}">
+             <el-tag
               :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
               size="small"
             >
               {{ row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="លម្អិត" width="100" align="center">
-          <template #default="{ row }">
-            <div class="detail-action">
+            </el-tag> 
+</template>
+
+<template #actions="{row}">
+              <div class="detail-action">
               <el-badge
                 :value="row.attendance_record?.length || 0"
                 :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
@@ -95,20 +106,11 @@
                 />
               </el-badge>
             </div>
-          </template>
-        </el-table-column>
-      </el-table>
+</template>
 
-      <div class="pagination-wrap">
-        <el-pagination
-          v-model:current-page="page"
-          v-model:page-size="pageSize"
-          :total="total"
-          layout="total, prev, pager, next"
-          @change="fetchAttendance"
-        />
-      </div>
-    </el-card>
+</AppTable>
+</el-card>
+
 
     <!-- Attendance Records Detail Dialog -->
     <el-dialog
@@ -173,6 +175,9 @@ import { ref, reactive, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { createAttendance, getAttendance } from "../api/services";
 import { LocationInformation } from "@element-plus/icons-vue";
+import AppFilterBar from "../../components/AppFilterBar.vue";
+import AppButton from "../../components/AppButton.vue";
+import AppTable from "../../components/AppTable.vue";
 const attendance = ref([]);
 const loading = ref(false);
 const checking = ref(false);

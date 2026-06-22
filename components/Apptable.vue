@@ -74,7 +74,7 @@ const props = defineProps({
   showIndex: { type: Boolean, default: false },
   indexLabel: { type: String, default: "ល.រ" },
   actionsLabel: { type: String, default: "សកម្មភាព" },
-  actionsWidth: { type: [String, Number], default: 120 },
+  actionsWidth: { type: [String, Number], default: 170 },
   mobileBreakpoint: { type: Number, default: 768 },
   showPagination: { type: Boolean, default: true },
   currentPage: { type: Number, default: 1 },
@@ -167,7 +167,6 @@ const isMobile = computed(() => windowWidth.value <= props.mobileBreakpoint);
   border-top: 1px solid var(--el-border-color-lighter);
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
 }
  
 .app-table-pagination {
