@@ -28,145 +28,129 @@
     </el-card> -->
 
     <!-- Filters -->
-     <AppFilterBar
-     :fields="[
-      {slot: 'name',span: 10},
-      {slot: 'date',span: 6}
-     ]"
-     :action-span="2"
-     >
-    <template #name>
-             <el-input
-            v-model="filters.name"
-            placeholder="ស្វែងរក"
-            prefix-icon="Search"
-            clearable
-            @change="fetchAttendance"
-            size="large"
-          />   
-    </template>
-    <template #date>
-          <el-date-picker
-            v-model="filters.check_date"
-            type="date"
-            placeholder="ជ្រេីសរេីសថ្ងៃទី"
-            value-format="YYYY-MM-DD"
-            clearable
-            @change="fetchAttendance"
-            style="width: 100%"
-            size="large"
-          />
-    </template>
-    <template #actions>
-      <AppButton type="primary" @click="fetchAttendance">
-        ស្វែងរក
-      </AppButton>
-    </template>
-     </AppFilterBar>
+    <AppFilterBar
+      :fields="[
+        { slot: 'name', span: 10 },
+        { slot: 'date', span: 6 },
+      ]"
+      :action-span="2"
+    >
+      <template #name>
+        <el-input
+          v-model="filters.name"
+          placeholder="ស្វែងរក"
+          prefix-icon="Search"
+          clearable
+          @change="fetchAttendance"
+          size="large"
+        />
+      </template>
+      <template #date>
+        <el-date-picker
+          v-model="filters.check_date"
+          type="date"
+          placeholder="ជ្រេីសរេីសថ្ងៃទី"
+          value-format="YYYY-MM-DD"
+          clearable
+          @change="fetchAttendance"
+          style="width: 100%"
+          size="large"
+        />
+      </template>
+      <template #actions>
+        <AppButton type="primary" @click="fetchAttendance"> ស្វែងរក </AppButton>
+      </template>
+    </AppFilterBar>
 
-<el-card>
-  <AppTable
-:data="attendance"
-:loading="loading"
-show-index
+    <el-card>
+      <AppTable
+        :data="attendance"
+        :loading="loading"
+        show-index
         v-model:current-page="page"
         v-model:page-size="pageSize"
         :total="total"
         @page-change="fetchAttendance"
         :columns="[
-          {prop: 'name',label: 'ឈ្មោះ',minWidth: 110},
-          {prop: 'gender_string',label: 'ភេទ',minWidth: 90},
-          {prop: 'role_name',label: 'តួនាទី',minWidth: 110},
-          {prop: 'company_name',label: 'ក្រុមហ៑ុន',minWidth: 130},
-          {prop: 'check_date',label: 'ថ្ងៃស្កែន',minWidth: 120},
-          {label: 'ស្ថានភាព',slot: 'status',width: 100}
-
+          { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
+          { prop: 'gender_string', label: 'ភេទ', minWidth: 90 },
+          { prop: 'role_name', label: 'តួនាទី', minWidth: 110 },
+          { prop: 'company_name', label: 'ក្រុមហ៑ុន', minWidth: 130 },
+          { prop: 'check_date', label: 'ថ្ងៃស្កែន', minWidth: 120 },
+          { label: 'ស្ថានភាព', slot: 'status', width: 100 },
         ]"
->
-<template #status="{row}">
-             <el-tag
+      >
+        <template #status="{ row }">
+          <el-tag
+            :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
+            size="small"
+          >
+            {{ row.status }}
+          </el-tag>
+        </template>
+
+        <template #actions="{ row }">
+          <div class="detail-action">
+            <el-badge
+              :value="row.attendance_record?.length || 0"
               :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
-              size="small"
             >
-              {{ row.status }}
-            </el-tag> 
-</template>
+              <el-button
+                size="small"
+                icon="List"
+                circle
+                @click="viewRecords(row)"
+              />
+            </el-badge>
+          </div>
+        </template>
+      </AppTable>
+    </el-card>
 
-<template #actions="{row}">
-              <div class="detail-action">
-              <el-badge
-                :value="row.attendance_record?.length || 0"
-                :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
-              >
-                <el-button
-                  size="small"
-                  icon="List"
-                  circle
-                  @click="viewRecords(row)"
-                />
-              </el-badge>
-            </div>
-</template>
-
-</AppTable>
-</el-card>
-
-
-    <!-- Attendance Records Detail Dialog -->
-    <el-dialog
+    <AppDialog
       v-model="recordsDialog"
       :title="`លម្អិត — ${selectedRow?.name}`"
       width="60%"
     >
-      <el-table
+      <AppTable
         :data="selectedRow?.attendance_record || []"
-        size="large"
-        stripe
+        :total="selectedRow?.attendance_record.length || []"
+        :columns="[
+          { prop: 'day_string', label: 'ថ្ងៃ', width: 100 },
+          { prop: 'type_string', label: 'ប្រភេទ', width: 150 },
+          { prop: 'check_time', label: 'ម៉ោងបានស្កែន', width: 150 },
+          { prop: 'scheduled_time', label: 'ម៉ោងត្រូវស្កែន', width: 110 },
+          { prop: 'time_diff', label: 'យឺត/មុនម៉ោង', width: 150 },
+          { label: 'ស្ថានភាព', slot: 'attendance_type_name', width: 100 },
+          { label: 'ទីតាំងស្កែន', slot: 'check_location' },
+          { label: 'មេីលទីតាំង', slot: 'view_location' },
+          { prop: 'reason', label: 'មូលហេតុ', width: 120 },
+        ]"
       >
-        <el-table-column prop="day_string" label="ថ្ងៃ" width="100" />
-        <el-table-column prop="type_string" label="ប្រភេទ" width="150" />
-        <el-table-column prop="check_time" label="ម៉ោងបានស្កែន" width="150" />
-        <el-table-column
-          prop="scheduled_time"
-          label="ម៉ោងត្រូវស្កែន"
-          width="110"
-        />
-        <el-table-column prop="time_diff" label="យឺត/មុនម៉ោង" width="150" />
-        <el-table-column
-          prop="attendance_type_name"
-          label="ស្ថានភាព"
-          min-width="100"
-        >
-          <template #default="{ row }">
-            <el-tag size="small" :type="getAttendTypeTag(row.attendance_type)">
-              {{ row.attendance_type_name || "—" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="ទីតាំងស្កែន" width="120" align="center">
-          <template #default="{ row }">
-            <el-icon size="large" :color="row.inzone ? '#67c23a' : '#f56c6c'">
-              <component
-                :is="row.inzone ? 'CircleCheckFilled' : 'CircleCloseFilled'"
-              />
-            </el-icon>
-          </template>
-        </el-table-column>
-        <el-table-column label="មេីលទីតាំង" width="120" align="center">
-          <template #default="{ row }">
-            <el-icon
-              size="large"
-              :color="row.inzone ? '#67c23a' : '#f56c6c'"
-              style="cursor: pointer"
-              @click="openLocation(row)"
-            >
-              <LocationInformation />
-            </el-icon>
-          </template>
-        </el-table-column>
-        <el-table-column prop="reason" label="មូលហេតុ" min-width="120" />
-      </el-table>
-    </el-dialog>
+        <template #attendance_type_name="{ row }">
+          <el-tag size="small" :type="getAttendTypeTag(row.attendance_type)">
+            {{ row.attendance_type_name || "—" }}
+          </el-tag>
+        </template>
+        <template #check_location="{ row }">
+          <el-icon size="large" :color="row.inzone ? '#67c23a' : '#f56c6c'">
+            <component
+              :is="row.inzone ? 'CircleCheckFilled' : 'CircleCloseFilled'"
+            />
+          </el-icon>
+        </template>
+        <template #view_location="{ row }">
+          <el-icon
+            size="large"
+            :color="row.inzone ? '#67c23a' : '#f56c6c'"
+            style="cursor: pointer"
+            @click="openLocation(row)"
+          >
+            <LocationInformation />
+          </el-icon>
+        </template>
+      </AppTable>
+    </AppDialog>
   </div>
 </template>
 
@@ -178,6 +162,7 @@ import { LocationInformation } from "@element-plus/icons-vue";
 import AppFilterBar from "../../components/AppFilterBar.vue";
 import AppButton from "../../components/AppButton.vue";
 import AppTable from "../../components/AppTable.vue";
+import AppDialog from "../../components/AppDialog.vue";
 const attendance = ref([]);
 const loading = ref(false);
 const checking = ref(false);

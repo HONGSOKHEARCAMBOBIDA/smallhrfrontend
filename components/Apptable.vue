@@ -1,43 +1,63 @@
 <template>
   <div class="app-table">
-    <el-table
-      v-if="!isMobile"
-      :data="data"
-      v-loading="loading"
-      stripe
-      border
-      v-bind="tableProps"
-    >
-      <el-table-column
-        v-if="showIndex"
-        type="index"
-        :label="indexLabel"
-        width="70"
-      />
+<el-table
+  v-if="!isMobile"
+  ref="tableRef"
+  :data="data"
+  v-loading="loading"
+  stripe
+  border
+  v-bind="tableProps"
+  @selection-change="onSelectionChange"
+>
+  <el-table-column
+    v-if="selectable"
+    type="selection"
+    width="50"
+  />
 
-      <el-table-column
-        v-for="col in columns"
-        :key="col.prop || col.label"
-        v-bind="col"
-      >
-        <template v-if="col.slot" #default="scope">
-          <slot :name="col.slot" v-bind="scope" />
-        </template>
-      </el-table-column>
+  <el-table-column
+    v-if="showIndex"
+    type="index"
+    :label="indexLabel"
+    width="70"
+  />
 
-      <el-table-column
-        v-if="$slots.actions"
-        :label="actionsLabel"
-        :width="actionsWidth"
-      >
-        <template #default="scope">
-          <slot name="actions" v-bind="scope" />
-        </template>
-      </el-table-column>
-    </el-table>
+  <el-table-column
+    v-for="col in columns"
+    :key="col.prop || col.label"
+    v-bind="col"
+  >
+    <template v-if="col.slot" #default="scope">
+      <slot :name="col.slot" v-bind="scope" />
+    </template>
+  </el-table-column>
+
+  <el-table-column
+    v-if="$slots.actions"
+    :label="actionsLabel"
+    :width="actionsWidth"
+  >
+    <template #default="scope">
+      <slot name="actions" v-bind="scope" />
+    </template>
+  </el-table-column>
+</el-table>
 <div v-else class="app-table-cards" v-loading="loading">
   <el-empty v-if="!data.length && !loading" description="គ្មានទិន្នន័យ" />
-  <div v-for="(row, idx) in data" :key="row.id ?? idx" class="app-table-card">
+  <div
+    v-for="(row, idx) in data"
+    :key="idx"
+    class="app-table-card"
+    :class="{ 'is-selected': selectable && isSelected(row) }"
+  >
+    <div v-if="selectable" class="app-table-card-header">
+      <el-checkbox
+        :model-value="isSelected(row)"
+        @change="(val) => toggleMobileSelection(row, val)"
+      />
+    </div>
+
     <div v-for="col in columns" :key="col.prop || col.label" class="app-table-card-row">
       <span class="app-table-card-label">{{ col.label }}</span>
       <span class="app-table-card-value">
@@ -50,7 +70,6 @@
     </div>
   </div>
 </div>
-
 
     <div v-if="showPagination" class="app-table-pagination">
       <el-pagination
@@ -65,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted,watch } from "vue";
 
 const props = defineProps({
   data: { type: Array, default: () => [] },
@@ -81,12 +100,14 @@ const props = defineProps({
   pageSize: { type: Number, default: 10 },
   total: { type: Number, default: 0 },
   tableProps: { type: Object, default: () => ({}) },
+  selectable: { type: Boolean, default: false },
 });
 
 const emit = defineEmits([
   "update:currentPage",
   "update:pageSize",
   "page-change",
+  "selection-change",
 ]);
 
 const currentPageProxy = computed({
@@ -106,6 +127,30 @@ onMounted(() => window.addEventListener("resize", onResize));
 onUnmounted(() => window.removeEventListener("resize", onResize));
 
 const isMobile = computed(() => windowWidth.value <= props.mobileBreakpoint);
+const selectedRows = ref([]);
+function onSelectionChange(rows) {
+  // fired by el-table on desktop
+  selectedRows.value = rows;
+  emit("selection-change", rows);
+}
+function isSelected(row) {
+  return selectedRows.value.includes(row);
+}
+function toggleMobileSelection(row, checked) {
+  if (checked) {
+    selectedRows.value.push(row);
+  } else {
+    selectedRows.value = selectedRows.value.filter((r) => r !== row);
+  }
+  emit("selection-change", selectedRows.value);
+}
+watch(
+  () => props.data,
+  () => {
+    selectedRows.value = [];
+    emit("selection-change", []);
+  }
+);
 </script>
 
 <style scoped>
@@ -175,6 +220,13 @@ const isMobile = computed(() => windowWidth.value <= props.mobileBreakpoint);
   justify-content: flex-end;
 }
  
+.app-table-card-header {
+  margin-bottom: 8px;
+}
+.app-table-card.is-selected {
+  border-color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
+}
 @media (max-width: 768px) {
   .app-table-pagination {
     justify-content: center;
