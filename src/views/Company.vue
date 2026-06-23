@@ -46,22 +46,27 @@
         </template>
 
         <template #actions="{ row }">
-          <el-button
-            v-if="canEditCompany"
+
+          <AppButton
+             v-if="canEditCompany"
             size="small"
             icon="Edit"
             type="warning"
             circle
-            @click="openEdit(row)"
-          />
-          <el-button
+            @click="openEdit(row)"         
+          >
+
+          </AppButton>
+          <AppButton
             v-if="canEditCompany"
             size="small"
             icon="Promotion"
             type="primary"
             circle
-            @click="openEditTelegram(row)"
-          />
+            @click="openEditTelegram(row)"          
+          >
+
+          </AppButton>
         </template>
       </AppTable>
     </el-card>
@@ -76,7 +81,6 @@
           :tabs="[
             { name: 'general', label: 'ព័ត៌មានទូទៅ' },
             { name: 'penalty', label: 'ប្រាក់ពិន័យ' },
-            { name: 'telegram', label: 'Telegram' },
           ]"
           tab-position="top"
           stretch="true"
@@ -160,7 +164,7 @@
               </el-form-item>
             </div>
           </template>
-          <template #telegram>
+          <!-- <template #telegram>
             <el-form-item label="Bot Token" prop="bot_token">
               <el-input
                 v-model="form.bot_token"
@@ -175,7 +179,7 @@
                 size="large"
               />
             </el-form-item>
-          </template>
+          </template> -->
         </AppTabs>
       </el-form>
       <template #footer>

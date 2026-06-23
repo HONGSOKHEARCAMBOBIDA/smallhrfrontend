@@ -169,7 +169,10 @@ const checking = ref(false);
 const page = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
-const filters = reactive({ name: "", check_date: "", company_id: "" });
+const filters = reactive({ 
+name: "", 
+check_date: new Date().toISOString().split("T")[0],  
+company_id: "" });
 const recordsDialog = ref(false);
 const selectedRow = ref(null);
 

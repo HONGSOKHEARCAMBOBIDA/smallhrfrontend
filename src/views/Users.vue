@@ -136,7 +136,7 @@
       ]"
       tab-position="top"
       stretch="true"
-      :lazy="false"
+      :lazy="true"
     >
       <template #general>
         <el-row :gutter="16">
@@ -238,44 +238,47 @@
               </el-select>
             </el-col>
             <el-col :xs="12" :sm="3">
-              <el-time-select
-                v-model="shift.check_in1"
-                placeholder="In 1"
-                size="large"
-                start="00:00"
-                end="23:30"
-                style="width: 100% ;margin-bottom: 10px;"
-              />
+<el-time-picker
+  v-model="shift.check_in1"
+  placeholder="In 1"
+  size="large"
+  value-format="HH:mm"
+  format="HH:mm"
+  style="width: 100%;margin-bottom: 10px;"
+/>
             </el-col>
             <el-col :xs="12" :sm="3">
-              <el-time-select
-                v-model="shift.check_out1"
-                placeholder="Out 1"
-                size="large"
-                start="00:00"
-                end="23:30"
-                style="width: 100% ;margin-bottom: 10px;"
-              />
+
+   <el-time-picker
+  v-model="shift.check_out1"
+  placeholder="In 1"
+  size="large"
+  value-format="HH:mm"
+  format="HH:mm"
+  style="width: 100%;margin-bottom: 10px;"
+/>
             </el-col>
             <el-col :xs="12" :sm="3">
-              <el-time-select
-                v-model="shift.check_in2"
-                placeholder="In 2"
-                size="large"
-                start="00:00"
-                end="23:30"
-                style="width: 100%;margin-bottom: 10px;"
-              />
+            
+         <el-time-picker
+  v-model="shift.check_in2"
+  placeholder="In 1"
+  size="large"
+  value-format="HH:mm"
+  format="HH:mm"
+  style="width: 100%;margin-bottom: 10px;"
+/>
             </el-col>
             <el-col :xs="12" :sm="3">
-              <el-time-select
-                v-model="shift.check_out2"
-                placeholder="Out 2"
-                size="large"
-                start="00:00"
-                end="23:30"
-                style="width: 100%;margin-bottom: 10px;"
-              />
+             
+                       <el-time-picker
+  v-model="shift.check_out2"
+  placeholder="In 1"
+  size="large"
+  value-format="HH:mm"
+  format="HH:mm"
+  style="width: 100%;margin-bottom: 10px;"
+/>
             </el-col>
             <el-col :xs="16" :sm="2">
               <el-checkbox v-model="shift.is_dayoff" size="large">
