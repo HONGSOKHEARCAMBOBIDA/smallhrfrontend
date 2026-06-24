@@ -226,6 +226,20 @@
                   </el-select>
                 </el-form-item>
               </el-col>
+                                <el-select
+                  
+                    placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៑ុន"
+                    clearable
+                    size="large"
+                    style="width: 100%"
+                  >
+                    <el-option
+                      v-for="managecp in managecompany"
+                      :key="managecp.id"
+                      :label="managecp.name"
+                      :value="managecp.id"
+                    />
+                  </el-select>
             </el-row>
           </template>
 
@@ -742,7 +756,8 @@ import {
   updateShift,
   createShift,
   getCompany,
-  deleteuser
+  deleteuser,
+  viewmanagecompany,
 } from "../api/services";
 import { Watch } from "@element-plus/icons-vue";
 import { watch } from "vue";
@@ -762,6 +777,7 @@ const qrDialog = ref(false);
 const qrImage = ref("");
 const users = ref([]);
 const roles = ref([]);
+const managecompany = ref([]);
 const companys = ref([]);
 const loading = ref(false);
 const saving = ref(false);
@@ -876,6 +892,7 @@ const debouncedFetch = debounce(() => {
 
 watch(() => filters.name, debouncedFetch);
 const createForm = reactive({
+
   company_id: null,
   name: "",
   phone_hash: "",
@@ -947,6 +964,18 @@ async function fetchRole() {
   } catch {
     ElMessage.error("Failed to load employees");
   } finally {
+    loading.value = false;
+  }
+}
+
+async function fetchmanagecompany(){
+  loading.value = true;
+  try {
+    const res = await viewmanagecompany()
+    managecompany.value = res.data.data || [];
+  }catch(e){
+ElMessage.error("Failed to load managecompany");
+  }finally{
     loading.value = false;
   }
 }
@@ -1198,6 +1227,7 @@ onMounted(() => {
   fetchCompany();
   fetchUsers();
   fetchRole();
+  fetchmanagecompany()
 });
 </script>
 

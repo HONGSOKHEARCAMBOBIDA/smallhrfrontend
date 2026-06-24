@@ -10,6 +10,7 @@ export const getCompany = (params) => api.get('/view.company', { params })
 export const createCompany = (data) => api.post('/add.company', data)
 export const updateCompany = (id, data) => api.put(`/edit.company/${id}`, data)
 export const updateTelegram = (id,data) => api.put(`/edit.telegram/${id}`,data)
+export const viewmanagecompany = () => api.get(`/view.manage.company`)
 
 // User
 export const getUsers = (params) => api.get('/view.user', { params })
