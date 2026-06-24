@@ -44,21 +44,93 @@
 
       <el-card class="dash-card">
         <template #header><span class="card-title">វត្តមានក្នុងថ្ងៃនេះ</span></template>
-        <div v-if="recentAttendance.length">
-          <div v-for="item in recentAttendance" :key="item.id" class="attend-row">
-            <el-avatar :size="32" style="background:#409eff; flex-shrink:0">
-              {{ item.name?.charAt(0)?.toUpperCase() }}
-            </el-avatar>
-            <div class="attend-info">
-              <div class="attend-name">{{ item.name }}</div>
-              <div class="attend-meta">{{ item.company_name }}</div>
-            </div>
-            <el-tag :type="item.status === 'COMPLETE' ? 'success' : 'warning'" size="small">
-              {{ item.status === 'COMPLETE' ? 'បានចេញ' : 'កំពុងធ្វេីការ' }}
-            </el-tag>
+            <el-card>
+      <AppTable
+        :data="recentAttendance"
+        :loading="loading"
+        :total="recentAttendance.length"
+        @page-change="getAttendance"
+        :columns="[
+          { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
+          { prop: 'gender_string', label: 'ភេទ', minWidth: 90 },
+          { prop: 'role_name', label: 'តួនាទី', minWidth: 110 },
+          { prop: 'company_name', label: 'ក្រុមហ៑ុន', minWidth: 130 },
+          { prop: 'check_date', label: 'ថ្ងៃស្កែន', minWidth: 120 },
+          { label: 'ស្ថានភាព', slot: 'status', width: 100 },
+        ]"
+      >
+        <template #status="{ row }">
+          <el-tag
+            :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
+            size="small"
+          >
+            {{ row.status }}
+          </el-tag>
+        </template>
+
+        <template #actions="{ row }">
+          <div class="detail-action">
+            <el-badge
+              :value="row.attendance_record?.length || 0"
+              :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
+            >
+              <el-button
+                size="large"
+                icon="List"
+                circle
+                @click="viewRecords(row)"
+              />
+            </el-badge>
           </div>
-        </div>
-        <el-empty v-else description="No attendance today" :image-size="60" />
+        </template>
+      </AppTable>
+    </el-card>
+
+
+    <AppDialog
+      v-model="recordsDialog"
+      :title="`លម្អិត — ${selectedRow?.name}`"
+      width="60%"
+    >
+      <AppTable
+        :data="selectedRow?.attendance_record || []"
+        :total="selectedRow?.attendance_record.length || []"
+        :columns="[
+          { prop: 'day_string', label: 'ថ្ងៃ', width: 100 },
+          { prop: 'type_string', label: 'ប្រភេទ', width: 150 },
+          { prop: 'check_time', label: 'ម៉ោងបានស្កែន', width: 150 },
+          { prop: 'scheduled_time', label: 'ម៉ោងត្រូវស្កែន', width: 110 },
+          { prop: 'time_diff', label: 'យឺត/មុនម៉ោង', width: 150 },
+          { label: 'ស្ថានភាព', slot: 'attendance_type_name', width: 100 },
+          { label: 'ទីតាំងស្កែន', slot: 'check_location' },
+          { label: 'មេីលទីតាំង', slot: 'view_location' },
+          { prop: 'reason', label: 'មូលហេតុ', width: 120 },
+        ]"
+      >
+        <template #attendance_type_name="{ row }">
+          <el-tag size="small" :type="getAttendTypeTag(row.attendance_type)">
+            {{ row.attendance_type_name || "—" }}
+          </el-tag>
+        </template>
+        <template #check_location="{ row }">
+          <el-icon size="large" :color="row.inzone ? '#67c23a' : '#f56c6c'">
+            <component
+              :is="row.inzone ? 'CircleCheckFilled' : 'CircleCloseFilled'"
+            />
+          </el-icon>
+        </template>
+        <template #view_location="{ row }">
+          <el-icon
+            size="large"
+            :color="row.inzone ? '#67c23a' : '#f56c6c'"
+            style="cursor: pointer"
+            @click="openLocation(row)"
+          >
+            <LocationInformation />
+          </el-icon>
+        </template>
+      </AppTable>
+    </AppDialog>
       </el-card>
     </div>
   </div>
@@ -67,7 +139,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getAttendance, countuser } from '../api/services'
-
+import { ElNotification } from 'element-plus'
+const loading = ref(false)
+const today = new Date().toISOString().split('T')[0]
+import AppTable from '../../components/AppTable.vue'
+import AppDialog from '../../components/AppDialog.vue'
+import { LocationInformation } from "@element-plus/icons-vue";
 const stats = ref([
   { label: 'បុគ្គលិកសរុប',  value: '—', icon: 'User',    color: '#409eff' },
   { label: 'វត្តមានថ្ងៃនេះ', value: '—', icon: 'Clock',   color: '#67c23a' },
@@ -75,21 +152,43 @@ const stats = ref([
   { label: 'ក្រុមហ៑ុន',      value: '—', icon: 'OfficeBuilding', color: '#f56c6c' },
 ])
 const recentAttendance = ref([])
+const recordsDialog = ref(false);
+const selectedRow = ref(null);
+async function loadAttendance() {
+  loading.value = true
 
-onMounted(async () => {
   try {
-    const today = new Date().toISOString().split('T')[0]
-    const [usersRes, attendRes] = await Promise.allSettled([
-     // countuser({}),
-      getAttendance({ page: 1, page_size: 5, check_date: today }),
-    ])
-    if (usersRes.status === 'fulfilled')
-      stats.value[0].value = usersRes.value.data.data.total || 0
-    if (attendRes.status === 'fulfilled') {
-      recentAttendance.value = attendRes.value.data.data || []
-      stats.value[1].value = recentAttendance.value.length
-    }
-  } catch {}
+    const res = await getAttendance({
+      check_date: today
+    })
+
+    recentAttendance.value = res.data.data || []
+  } catch (e) {
+    ElNotification({
+      title: 'មានបញ្ហា',
+      message: e.response?.data?.error || e.message
+    })
+  } finally {
+    loading.value = false
+  }
+}
+function openLocation(row) {
+  if (!row.latitdude || !row.longitude) {
+    return ElMessage.warning("មិនមានទីតាំងស្កែន");
+  }
+  const url = `https://www.google.com/maps?q=${row.latitdude},${row.longitude}`;
+  window.open(url, "_blank");
+}
+function getAttendTypeTag(type) {
+  const map = { 1: "success", 2: "info", 3: "warning", 4: "danger" };
+  return map[type] || "info";
+}
+function viewRecords(row) {
+  selectedRow.value = row;
+  recordsDialog.value = true;
+}
+onMounted(async () => {
+loadAttendance()
 })
 </script>
 
@@ -121,6 +220,7 @@ onMounted(async () => {
 }
 .stat-value { font-size: 24px; font-weight: 700; color: #1a1a2e; }
 .stat-label { font-size: 12px; color: #888; margin-top: 2px; }
+
 
 /* ── Dashboard two-col grid ──────────────────── */
 .dash-grid {
@@ -179,6 +279,10 @@ onMounted(async () => {
 }
 .attend-meta { font-size: 11px; color: #13097b; }
 
+.detail-action {
+  padding: 10px 0;
+}
+
 /* ── Mobile overrides ────────────────────────── */
 @media (max-width: 767px) {
   .stat-grid {
@@ -196,6 +300,7 @@ onMounted(async () => {
     gap: 12px;
   }
 }
+
 
 @media (max-width: 400px) {
   /* Very small screens: action buttons tighter */

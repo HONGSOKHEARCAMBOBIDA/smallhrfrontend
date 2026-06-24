@@ -81,6 +81,7 @@
           :tabs="[
             { name: 'general', label: 'ព័ត៌មានទូទៅ' },
             { name: 'penalty', label: 'ប្រាក់ពិន័យ' },
+            {name: 'telegram',label: 'Telegram'}
           ]"
           tab-position="top"
           stretch="true"
@@ -108,6 +109,7 @@
                 placeholder="https://maps.google.com/..."
               />
             </el-form-item>
+
 
             <div class="form-row">
               <el-form-item label="Latitude" prop="latitude">
@@ -164,7 +166,7 @@
               </el-form-item>
             </div>
           </template>
-          <!-- <template #telegram>
+          <template #telegram>
             <el-form-item label="Bot Token" prop="bot_token">
               <el-input
                 v-model="form.bot_token"
@@ -179,7 +181,7 @@
                 size="large"
               />
             </el-form-item>
-          </template> -->
+          </template>
         </AppTabs>
       </el-form>
       <template #footer>
@@ -219,6 +221,7 @@
           </el-form-item>
         </div>
       </el-form>
+
 
       <template #footer>
         <AppButton @click="dialogTelegramVisible = false" size="large" :block="false">
@@ -322,6 +325,8 @@ function openCreate() {
   isEdit.value = false;
   Object.keys(form).forEach((k) => (form[k] = ""));
   form.can_scan_outsize = null;
+  form.late_penalty = 0;
+  form.left_early_penalty = 0;
   dialogVisible.value = true;
 }
 
@@ -353,6 +358,7 @@ function openEditTelegram(row) {
   });
   dialogTelegramVisible.value = true;
 }
+
 
 async function handleSave() {
   await formRef.value.validate();

@@ -78,6 +78,7 @@ function handleCommand(cmd) {
 <style scoped>
 .layout { height: 100vh; display: flex; overflow: hidden; }
 
+
 /* Sidebar */
 .sidebar { width: 260px; background: #1a1a2e; display: flex; flex-direction: column; transition: width .3s; overflow: hidden; flex-shrink: 0; }
 .sidebar.collapsed { width: 64px; }

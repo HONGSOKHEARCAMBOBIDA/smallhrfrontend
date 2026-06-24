@@ -93,7 +93,7 @@ const props = defineProps({
   showIndex: { type: Boolean, default: false },
   indexLabel: { type: String, default: "ល.រ" },
   actionsLabel: { type: String, default: "សកម្មភាព" },
-  actionsWidth: { type: [String, Number], default: 170 },
+  actionsWidth: { type: [String, Number], default: 190 },
   mobileBreakpoint: { type: Number, default: 768 },
   showPagination: { type: Boolean, default: true },
   currentPage: { type: Number, default: 1 },
