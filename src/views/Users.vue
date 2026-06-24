@@ -1,54 +1,27 @@
 <template>
   <div>
-    <AppFilterBar
-      :fields="[
-        { slot: 'name', span: 10 },
-        { slot: 'role', span: 6 },
-        { slot: 'company', span: 5 },
-      ]"
-      :action-span="3"
-    >
+    <AppFilterBar :fields="[
+      { slot: 'name', span: 10 },
+      { slot: 'role', span: 6 },
+      { slot: 'company', span: 5 },
+    ]" :action-span="3">
       <template #name>
-        <el-input
-          v-model="filters.name"
-          placeholder="ស្វែងរក"
-          prefix-icon="Search"
-          clearable
-          @input="fetchUsers"
-        />
+        <!-- <el-input v-model="filters.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable @input="fetchUsers" /> -->
+        <AppInput v-model="filters.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable @input="fetchUsers">
+
+        </AppInput>
       </template>
 
       <template #role>
-        <el-select
-          v-model="filters.role_id"
-          placeholder="តួនាទី"
-          clearable
-          style="width: 100%"
-          @change="fetchUsers"
-        >
-          <el-option
-            v-for="role in roles"
-            :key="role.id"
-            :label="role.display_name"
-            :value="role.id"
-          />
+        <el-select v-model="filters.role_id" placeholder="តួនាទី" clearable style="width: 100%" @change="fetchUsers" size="large">
+          <el-option v-for="role in roles" :key="role.id" :label="role.display_name" :value="role.id" />
         </el-select>
       </template>
 
       <template #company>
-        <el-select
-          v-model="filters.company_id"
-          placeholder="ក្រុមហ៑ុន"
-          clearable
-          style="width: 100%"
-          @change="fetchUsers"
-        >
-          <el-option
-            v-for="company in companys"
-            :key="company.id"
-            :label="company.name"
-            :value="company.id"
-          />
+        <el-select v-model="filters.company_id" placeholder="ក្រុមហ៑ុន" clearable style="width: 100%" size="large"
+          @change="fetchUsers">
+          <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
         </el-select>
       </template>
       <template #actions>
@@ -58,15 +31,8 @@
       </template>
     </AppFilterBar>
     <el-card>
-      <AppTable
-        :data="users"
-        :loading="loading"
-        show-index
-        v-model:current-page="page"
-        v-model:page-size="pageSize"
-        :total="total"
-        @page-change="fetchUsers"
-        :columns="[
+      <AppTable :data="users" :loading="loading" show-index v-model:current-page="page" v-model:page-size="pageSize"
+        :total="total" @page-change="fetchUsers" :columns="[
           { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
           { prop: 'gender_string', label: 'ភេទ', minWidth: 90 },
           { prop: 'phone_hash', label: 'លេខទូរសព្ទ', minWidth: 130 },
@@ -75,9 +41,7 @@
           { label: 'QR Token', slot: 'qrtoken', width: 150 },
           { prop: 'base_salary', label: 'ប្រាក់ខែ', width: 120 },
           { label: 'ស្ថានភាព', slot: 'status', width: 100 },
-        ]"
-        actionsWidth="200"
-      >
+        ]" actionsWidth="200">
         <template #qrtoken="{ row }">
           <el-button type="primary" link @click="openQR(row.qr_token)">
             View QR
@@ -89,234 +53,139 @@
           </el-tag>
         </template>
         <template #actions="{ row }" v-if="canedit">
-          <AppButton
-            size="small"
-            icon="Edit"
-            type="warning"
-            circle
-            @click="openEdit(row)"
-          >
+          <AppButton size="small" icon="Edit" type="warning" circle @click="openEdit(row)">
           </AppButton>
-          <AppButton
-            size="small"
-            :icon="row.is_active ? 'CircleClose' : 'CircleCheck'"
-            :type="row.is_active ? 'danger' : 'success'"
-            circle
-            @click="toggleStatus(row)"
-          >
+          <AppButton size="small" :icon="row.is_active ? 'CircleClose' : 'CircleCheck'"
+            :type="row.is_active ? 'danger' : 'success'" circle @click="toggleStatus(row)">
           </AppButton>
-          <AppButton
-            size="small"
-            icon="View"
-            type="primary"
-            circle
-            @click="openShifts(row)"
-          >
+          <AppButton size="small" icon="View" type="primary" circle @click="openShifts(row)">
           </AppButton>
-          <AppButton
-            size="small"
-            icon="Delete"
-            type="danger"
-            circle
-            @click="DeleteUser(row)"
-          >
+          <AppButton size="small" icon="Delete" type="danger" circle @click="DeleteUser(row)">
           </AppButton>
         </template>
       </AppTable>
     </el-card>
-    <AppDialog
-      v-model="createDialog"
-      :title="isEdit ? 'កែប្រែបុគ្គលិក' : 'បន្ថែមបុគ្គលិក'"
-      width="983px"
-    >
-      <el-form
-        :model="createForm"
-        :rules="createRules"
-        ref="createFormRef"
-        label-position="top"
-      >
-        <AppTabs
-          v-model="activeTab"
-          :tabs="[
-            { name: 'general', label: 'ព័ត៌មានទូទៅ' },
-            { name: 'shifts', label: 'ម៉ោងធ្វើការ' },
-          ]"
-          tab-position="top"
-          stretch="true"
-          :lazy="true"
-        >
+    <AppDialog v-model="createDialog" :title="isEdit ? 'កែប្រែបុគ្គលិក' : 'បន្ថែមបុគ្គលិក'" width="983px">
+      <el-form :model="createForm" :rules="createRules" ref="createFormRef" label-position="top">
+        <AppTabs v-model="activeTab" :tabs="[
+          { name: 'general', label: 'ព័ត៌មានទូទៅ' },
+          { name: 'shifts', label: 'ម៉ោងធ្វើការ' },
+        ]" tab-position="top" stretch="true" :lazy="true">
           <template #general>
             <el-row :gutter="16">
               <el-col :xs="24" :sm="12">
-                <AppInput
-                  label="ឈ្មោះ"
-                  prop="name"
-                  clearable
-                  v-model="createForm.name"
-                >
+                <AppInput label="ឈ្មោះ" prop="name" clearable v-model="createForm.name">
                 </AppInput>
               </el-col>
               <el-col :xs="24" :sm="12">
-                <AppInput
-                  label="លេខទូរសព្ទ"
-                  prop="phone_hash"
-                  clearable
-                  type="number"
-                  v-model="createForm.phone_hash"
-                  size="large"
-                  trim
-                >
+                <AppInput label="លេខទូរសព្ទ" prop="phone_hash" clearable type="number" v-model="createForm.phone_hash"
+                  size="large" trim>
                 </AppInput>
               </el-col>
               <el-col :xs="24" :sm="12">
                 <el-form-item label="តួនាទី" prop="role_id">
-                  <el-select
-                    v-model="createForm.role_id"
-                    placeholder="ជ្រើសតួនាទី"
-                    clearable
-                    size="large"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="role in roles"
-                      :key="role.id"
-                      :label="role.display_name"
-                      :value="role.id"
-                    />
+                  <el-select v-model="createForm.role_id" placeholder="ជ្រើសតួនាទី" clearable size="large"
+                    style="width: 100%">
+                    <el-option v-for="role in roles" :key="role.id" :label="role.display_name" :value="role.id" />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="12">
                 <el-form-item label="ភេទ" prop="gender">
-                  <el-select
-                    v-model="createForm.gender"
-                    size="large"
-                    style="width: 100%"
-                  >
+                  <el-select v-model="createForm.gender" size="large" style="width: 100%">
                     <el-option label="ប្រុស" :value="1" />
                     <el-option label="ស្រី" :value="2" />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="12">
-                <AppInput
-                  label="ប្រាក់ខែ"
-                  clearable
-                  type="number"
-                  v-model="createForm.base_salary"
-                  trim
-                >
+                <AppInput label="ប្រាក់ខែ" clearable type="number" v-model="createForm.base_salary" trim>
                 </AppInput>
               </el-col>
               <el-col :xs="24" :sm="12">
                 <el-form-item label="ក្រុមហ៑ុន" prop="company_id">
-                  <el-select
-                    v-model="createForm.company_id"
-                    placeholder="ជ្រើសក្រុមហ៑ុន"
-                    clearable
-                    size="large"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="company in companys"
-                      :key="company.id"
-                      :label="company.name"
-                      :value="company.id"
-                    />
+                  <el-select v-model="createForm.company_id" placeholder="ជ្រើសក្រុមហ៑ុន" clearable size="large"
+                    style="width: 100%">
+                    <el-option v-for="company in companys" :key="company.id" :label="company.name"
+                      :value="company.id" />
                   </el-select>
                 </el-form-item>
               </el-col>
-                                <el-select
-                  
-                    placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៑ុន"
-                    clearable
-                    size="large"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="managecp in managecompany"
-                      :key="managecp.id"
-                      :label="managecp.name"
-                      :value="managecp.id"
-                    />
-                  </el-select>
+                    <el-col :xs="24" :sm="12">
+        <el-form-item label="សិទ្ធ">
+          <el-select
+            v-model="createForm.manage_company"
+            placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៊ុន"
+            clearable
+            size="large"
+            style="width: 100%"
+          >
+            <el-option
+
+              v-for="managecp in managecompany"
+              :key="managecp.id"
+              :label="managecp.name"
+              :value="managecp.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+          <el-col :xs="24" :sm="12">
+        <el-form-item label="សាខាដែលអាចមើលទិន្នន័យ">
+          <el-select
+            :disabled="createForm.manage_company != 2"
+            v-model="createForm.company_ids"
+            placeholder="ជ្រើសរើស"
+            multiple
+            clearable
+            size="large"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="cp in companys"
+              :key="cp.id"
+              :label="cp.name"
+              :value="cp.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+
             </el-row>
           </template>
 
           <template #shifts>
-            <div
-              v-for="(shift, i) in createForm.shifts"
-              :key="i"
-              class="shift-row"
-            >
+            <div v-for="(shift, i) in createForm.shifts" :key="i" class="shift-row">
               <el-row :gutter="8" align="middle">
                 <el-col :xs="12" :sm="4" :gap="5">
-                  <el-select
-                    v-model="shift.day"
-                    placeholder="Day"
-                    size="large"
-                    style="width: 100%; margin-bottom: 10px"
-                  >
-                    <el-option
-                      v-for="(d, idx) in days"
-                      :key="idx"
-                      :label="d"
-                      :value="idx + 1"
-                    />
+                  <el-select v-model="shift.day" placeholder="Day" size="large"
+                    style="width: 100%; margin-bottom: 10px">
+                    <el-option v-for="(d, idx) in days" :key="idx" :label="d" :value="idx + 1" />
                   </el-select>
                 </el-col>
                 <el-col :xs="12" :sm="4">
-                  <el-select
-                    v-model="shift.shift_type"
-                    placeholder="Type"
-                    size="large"
-                    clearable
-                    style="width: 100%; margin-bottom: 10px"
-                  >
+                  <el-select v-model="shift.shift_type" placeholder="Type" size="large" clearable
+                    style="width: 100%; margin-bottom: 10px">
                     <el-option label="ធ្វេីការពេញម៉ោង" :value="1" />
                     <el-option label="ធ្វេីការតែមួយព្រឹក" :value="2" />
                     <el-option label="ធ្វេីការតែមួយរសៀល" :value="3" />
                   </el-select>
                 </el-col>
                 <el-col :xs="12" :sm="3">
-                  <el-time-picker
-                    v-model="shift.check_in1"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+                  <el-time-picker v-model="shift.check_in1" placeholder="In 1" size="large" value-format="HH:mm"
+                    format="HH:mm" style="width: 100%; margin-bottom: 10px" />
                 </el-col>
                 <el-col :xs="12" :sm="3">
-                  <el-time-picker
-                    v-model="shift.check_out1"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+                  <el-time-picker v-model="shift.check_out1" placeholder="In 1" size="large" value-format="HH:mm"
+                    format="HH:mm" style="width: 100%; margin-bottom: 10px" />
                 </el-col>
                 <el-col :xs="12" :sm="3">
-                  <el-time-picker
-                    v-model="shift.check_in2"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+                  <el-time-picker v-model="shift.check_in2" placeholder="In 1" size="large" value-format="HH:mm"
+                    format="HH:mm" style="width: 100%; margin-bottom: 10px" />
                 </el-col>
                 <el-col :xs="12" :sm="3">
-                  <el-time-picker
-                    v-model="shift.check_out2"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+                  <el-time-picker v-model="shift.check_out2" placeholder="In 1" size="large" value-format="HH:mm"
+                    format="HH:mm" style="width: 100%; margin-bottom: 10px" />
                 </el-col>
                 <el-col :xs="16" :sm="2">
                   <el-checkbox v-model="shift.is_dayoff" size="large">
@@ -324,25 +193,13 @@
                   </el-checkbox>
                 </el-col>
                 <el-col :xs="8" :sm="2" style="text-align: right">
-                  <AppButton
-                    size="small"
-                    icon="Delete"
-                    circle
-                    type="danger"
-                    @click="createForm.shifts.splice(i, 1)"
-                  />
+                  <AppButton size="small" icon="Delete" circle type="danger" @click="createForm.shifts.splice(i, 1)" />
                 </el-col>
               </el-row>
             </div>
 
-            <AppButton
-              size="small"
-              icon="Plus"
-              type="default"
-              :block="false"
-              @click="addShift"
-              :disabled="createForm.shifts.length >= 7"
-            >
+            <AppButton size="small" icon="Plus" type="default" :block="false" @click="addShift"
+              :disabled="createForm.shifts.length >= 7">
               បន្ថែមវេនការងារ
             </AppButton>
           </template>
@@ -350,33 +207,17 @@
       </el-form>
 
       <template #footer>
-        <AppButton
-          @click="createDialog = false"
-          size="large"
-          :block="false"
-          type="warning"
-        >
+        <AppButton @click="createDialog = false" size="large" :block="false" type="warning">
           បោះបង់
         </AppButton>
-        <AppButton
-          @click="handleCreate"
-          type="primary"
-          :loading="saving"
-          size="large"
-          :block="false"
-        >
+        <AppButton @click="handleCreate" type="primary" :loading="saving" size="large" :block="false">
           {{ isEdit ? "កែប្រែ" : "បង្កេីត" }}
         </AppButton>
       </template>
     </AppDialog>
 
     <AppDialog v-model="editDialog" title="កែប្រែបុគ្គលិក" width="800px">
-      <el-form
-        :model="editForm"
-        :rules="rules"
-        ref="editFormRef"
-        label-position="top"
-      >
+      <el-form :model="editForm" :rules="rules" ref="editFormRef" label-position="top">
         <el-row :gutter="16">
           <el-col :xs="24" :sm="12">
             <el-form-item label="ឈ្មោះ" prop="name">
@@ -386,20 +227,13 @@
 
           <el-col :xs="24" :sm="12">
             <el-form-item label="លេខទូរសព្ទ" prop="phone_hash">
-              <el-input
-                v-model="editForm.phone_hash"
-                placeholder="0xx xxx xxx"
-              />
+              <el-input v-model="editForm.phone_hash" placeholder="0xx xxx xxx" />
             </el-form-item>
           </el-col>
 
           <el-col :xs="24" :sm="12">
             <el-form-item label="ភេទ" prop="gender">
-              <el-select
-                v-model="editForm.gender"
-                placeholder="ជ្រើសភេទ"
-                style="width: 100%"
-              >
+              <el-select v-model="editForm.gender" placeholder="ជ្រើសភេទ" style="width: 100%">
                 <el-option label="ប្រុស" :value="1" />
                 <el-option label="ស្រី" :value="2" />
               </el-select>
@@ -408,46 +242,21 @@
 
           <el-col :xs="24" :sm="12">
             <el-form-item label="ប្រាក់ខែ" prop="base_salary">
-              <el-input
-                v-model="editForm.base_salary"
-                :min="0"
-                controls-position="right"
-                style="width: 100%"
-              />
+              <el-input v-model="editForm.base_salary" :min="0" controls-position="right" style="width: 100%" />
             </el-form-item>
           </el-col>
 
           <el-col :xs="24" :sm="12">
             <el-form-item label="តួនាទី" prop="role_id">
-              <el-select
-                v-model="editForm.role_id"
-                placeholder="ជ្រើសតួនាទី"
-                clearable
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="role in roles"
-                  :key="role.id"
-                  :label="role.display_name"
-                  :value="role.id"
-                />
+              <el-select v-model="editForm.role_id" placeholder="ជ្រើសតួនាទី" clearable style="width: 100%">
+                <el-option v-for="role in roles" :key="role.id" :label="role.display_name" :value="role.id" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12">
             <el-form-item label="ក្រុនហ៑ុន" prop="company_id">
-              <el-select
-                v-model="editForm.company_id"
-                placeholder="ជ្រើសក្រុនហ៑ុន"
-                clearable
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="company in companys"
-                  :key="company.id"
-                  :label="company.name"
-                  :value="company.id"
-                />
+              <el-select v-model="editForm.company_id" placeholder="ជ្រើសក្រុនហ៑ុន" clearable style="width: 100%">
+                <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -465,56 +274,25 @@
       </template>
     </AppDialog>
 
-    <AppDialog
-      v-model="shiftsDialog"
-      :title="`វេនធ្វើការ របស់ ${selectedUser?.name}`"
-      width="50%"
-      class="shift-dialog"
-      @closed="shiftsEditMode = false"
-    >
-      <div
-        style="display: flex; justify-content: flex-end; margin-bottom: 12px"
-      >
-        <AppButton
-          icon="Plus"
-          size="large"
-          type="success"
-          :block="false"
-          :disabled="selectedUser?.shift_response?.length >= 7"
-          @click="startShiftCreate"
-        >
+    <AppDialog v-model="shiftsDialog" :title="`វេនធ្វើការ របស់ ${selectedUser?.name}`" width="50%" class="shift-dialog"
+      @closed="shiftsEditMode = false">
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 12px">
+        <AppButton icon="Plus" size="large" type="success" :block="false"
+          :disabled="selectedUser?.shift_response?.length >= 7" @click="startShiftCreate">
           បន្ថែមវេន
         </AppButton>
-        <AppButton
-          v-if="!shiftsEditMode"
-          icon="Edit"
-          size="large"
-          type="default"
-          :block="false"
-          @click="startShiftEdit"
-        >
+        <AppButton v-if="!shiftsEditMode" icon="Edit" size="large" type="default" :block="false"
+          @click="startShiftEdit">
           កែប្រែ
         </AppButton>
       </div>
 
-      <el-table
-        :data="editableShifts"
-        size="large"
-        stripe
-        border
-        empty-text="មិនមានទិន្នន័យវេនការងារ"
-      >
+      <el-table :data="editableShifts" size="large" stripe border empty-text="មិនមានទិន្នន័យវេនការងារ">
         <el-table-column prop="day_name" label="ថ្ងៃ" width="80" fixed />
 
         <el-table-column label="ប្រភេទ" width="190">
           <template #default="{ row }">
-            <el-select
-              v-if="shiftsEditMode"
-              v-model="row.shift_type"
-              size="large"
-              style="width: 100%"
-              clearable
-            >
+            <el-select v-if="shiftsEditMode" v-model="row.shift_type" size="large" style="width: 100%" clearable>
               <el-option label="ធ្វេីការពេញម៉ោង" :value="1" />
               <el-option label="ធ្វេីការតែមួយព្រឹក" :value="2" />
               <el-option label="ធ្វេីការតែមួយរសៀល" :value="3" />
@@ -525,14 +303,8 @@
 
         <el-table-column label="ចូលវេន១" width="165">
           <template #default="{ row }">
-            <el-time-picker
-              v-if="shiftsEditMode"
-              v-model="row.check_in1"
-              size="large"
-              value-format="HH:mm"
-              format="HH:mm"
-              style="width: 100%; margin-bottom: 10px"
-            >
+            <el-time-picker v-if="shiftsEditMode" v-model="row.check_in1" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px">
             </el-time-picker>
             <span v-else>{{ row.check_in1 || "—" }}</span>
           </template>
@@ -540,14 +312,8 @@
 
         <el-table-column label="ចេញវេន១" width="165">
           <template #default="{ row }">
-            <el-time-picker
-              v-if="shiftsEditMode"
-              v-model="row.check_out1"
-              size="large"
-              value-format="HH:mm"
-              format="HH:mm"
-              style="width: 100%; margin-bottom: 10px"
-            >
+            <el-time-picker v-if="shiftsEditMode" v-model="row.check_out1" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px">
             </el-time-picker>
             <span v-else>{{ row.check_out1 || "—" }}</span>
           </template>
@@ -555,14 +321,8 @@
 
         <el-table-column label="ចូលវេន២" width="165">
           <template #default="{ row }">
-            <el-time-picker
-              v-if="shiftsEditMode"
-              v-model="row.check_in2"
-              size="large"
-              value-format="HH:mm"
-              format="HH:mm"
-              style="width: 100%; margin-bottom: 10px"
-            >
+            <el-time-picker v-if="shiftsEditMode" v-model="row.check_in2" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px">
             </el-time-picker>
             <span v-else>{{ row.check_in2 || "—" }}</span>
           </template>
@@ -570,14 +330,8 @@
 
         <el-table-column label="ចេញវេន២" width="165">
           <template #default="{ row }">
-            <el-time-picker
-              v-if="shiftsEditMode"
-              v-model="row.check_out2"
-              size="large"
-              value-format="HH:mm"
-              format="HH:mm"
-              style="width: 100%; margin-bottom: 10px"
-            >
+            <el-time-picker v-if="shiftsEditMode" v-model="row.check_out2" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px">
             </el-time-picker>
             <span v-else>{{ row.check_out2 || "—" }}</span>
           </template>
@@ -595,114 +349,54 @@
 
       <template #footer>
         <template v-if="shiftsEditMode">
-          <AppButton
-            @click="cancelShiftEdit"
-            size="large"
-            :block="false"
-            type="warning"
-          >
+          <AppButton @click="cancelShiftEdit" size="large" :block="false" type="warning">
             បោះបង់
           </AppButton>
-          <AppButton
-            type="primary"
-            :loading="savingShifts"
-            @click="handleShiftUpdate"
-            size="large"
-            :block="false"
-          >
+          <AppButton type="primary" :loading="savingShifts" @click="handleShiftUpdate" size="large" :block="false">
             រក្សាទុក
           </AppButton>
         </template>
       </template>
     </AppDialog>
 
-    <el-dialog
-      v-model="qrDialog"
-      title="ស្កែន QR"
-      width="220px"
-      center
-      :show-close="false"
-    >
+    <el-dialog v-model="qrDialog" title="ស្កែន QR" width="220px" center :show-close="false">
       <div class="qr-box">
         <img v-if="qrImage" :src="qrImage" />
       </div>
     </el-dialog>
 
-    <AppDialog
-      v-model="shiftsCreateDialog"
-      title="បន្ថែមវេនការងារ"
-      width="1200px"
-    >
+    <AppDialog v-model="shiftsCreateDialog" title="បន្ថែមវេនការងារ" width="1200px">
       <div v-for="(shift, i) in newShifts" :key="i" class="shift-row">
         <el-row :gutter="8" align="middle">
           <el-col :xs="12" :sm="4" :gap="5">
-            <el-select
-              v-model="shift.day"
-              placeholder="Day"
-              size="large"
-              style="width: 100%; margin-bottom: 10px"
-            >
-              <el-option
-                v-for="(d, idx) in days"
-                :key="idx"
-                :label="d"
-                :value="idx + 1"
-              />
+            <el-select v-model="shift.day" placeholder="Day" size="large" style="width: 100%; margin-bottom: 10px">
+              <el-option v-for="(d, idx) in days" :key="idx" :label="d" :value="idx + 1" />
             </el-select>
           </el-col>
           <el-col :xs="12" :sm="4">
-            <el-select
-              v-model="shift.shift_type"
-              placeholder="Type"
-              size="large"
-              clearable
-              style="width: 100%; margin-bottom: 10px"
-            >
+            <el-select v-model="shift.shift_type" placeholder="Type" size="large" clearable
+              style="width: 100%; margin-bottom: 10px">
               <el-option label="ធ្វេីការពេញម៉ោង" :value="1" />
               <el-option label="ធ្វេីការតែមួយព្រឹក" :value="2" />
               <el-option label="ធ្វេីការតែមួយរសៀល" :value="3" />
             </el-select>
           </el-col>
           <el-col :xs="12" :sm="3">
-          
-                              <el-time-picker
-                    v-model="shift.check_in1"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+
+            <el-time-picker v-model="shift.check_in1" placeholder="In 1" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px" />
           </el-col>
           <el-col :xs="12" :sm="3">
-          <el-time-picker
-                    v-model="shift.check_out1"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+            <el-time-picker v-model="shift.check_out1" placeholder="In 1" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px" />
           </el-col>
           <el-col :xs="12" :sm="3">
-               <el-time-picker
-                    v-model="shift.check_in2"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+            <el-time-picker v-model="shift.check_in2" placeholder="In 1" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px" />
           </el-col>
           <el-col :xs="12" :sm="3">
-               <el-time-picker
-                    v-model="shift.check_out2"
-                    placeholder="In 1"
-                    size="large"
-                    value-format="HH:mm"
-                    format="HH:mm"
-                    style="width: 100%; margin-bottom: 10px"
-                  />
+            <el-time-picker v-model="shift.check_out2" placeholder="In 1" size="large" value-format="HH:mm"
+              format="HH:mm" style="width: 100%; margin-bottom: 10px" />
           </el-col>
           <el-col :xs="16" :sm="2">
             <el-checkbox v-model="shift.is_dayoff" size="large">
@@ -710,33 +404,18 @@
             </el-checkbox>
           </el-col>
           <el-col :xs="8" :sm="2" style="text-align: right">
-            <AppButton
-              size="small"
-              icon="Delete"
-              circle
-              type="danger"
-              @click="newShifts.splice(i, 1)"
-            />
+            <AppButton size="small" icon="Delete" circle type="danger" @click="newShifts.splice(i, 1)" />
           </el-col>
         </el-row>
       </div>
-      <el-button
-        size="small"
-        icon="Plus"
-        style="margin-top: 8px"
-        @click="addNewShiftRow"
-        :disabled="newShifts.length >= 7"
-      >
+      <el-button size="small" icon="Plus" style="margin-top: 8px" @click="addNewShiftRow"
+        :disabled="newShifts.length >= 7">
         បន្ថែមជួរ
       </el-button>
 
       <template #footer>
         <el-button @click="shiftsCreateDialog = false">បោះបង់</el-button>
-        <el-button
-          type="primary"
-          :loading="savingShifts"
-          @click="handleShiftCreate"
-        >
+        <el-button type="primary" :loading="savingShifts" @click="handleShiftCreate">
           រក្សាទុក
         </el-button>
       </template>
@@ -892,7 +571,8 @@ const debouncedFetch = debounce(() => {
 
 watch(() => filters.name, debouncedFetch);
 const createForm = reactive({
-
+  company_ids: [],
+  manage_company:null,
   company_id: null,
   name: "",
   phone_hash: "",
@@ -968,14 +648,14 @@ async function fetchRole() {
   }
 }
 
-async function fetchmanagecompany(){
+async function fetchmanagecompany() {
   loading.value = true;
   try {
     const res = await viewmanagecompany()
     managecompany.value = res.data.data || [];
-  }catch(e){
-ElMessage.error("Failed to load managecompany");
-  }finally{
+  } catch (e) {
+    ElMessage.error("Failed to load managecompany");
+  } finally {
     loading.value = false;
   }
 }
@@ -1122,9 +802,9 @@ async function handleUpdate() {
   } catch (e) {
     ElMessage.error(
       e.response?.data?.message ||
-        e.response?.data?.error ||
-        e.message ||
-        "Failed to update",
+      e.response?.data?.error ||
+      e.message ||
+      "Failed to update",
     );
   } finally {
     saving.value = false;
@@ -1236,24 +916,29 @@ onMounted(() => {
   border-radius: 6px;
   padding: 4px 0;
 }
+
 .table-card {
   border-radius: 6px;
 }
+
 .pagination-wrap {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
 }
+
 .shift-row {
   background: #f9f9f9;
   border-radius: 8px;
   padding: 10px;
   margin-bottom: 8px;
 }
+
 :deep(.el-table__header-wrapper th) {
   background-color: #4589ce !important;
   color: #ffffff !important;
 }
+
 .shift-dialog .el-dialog__header {
   padding: 20px 24px;
   border-bottom: 1px solid #f0f0f0;
