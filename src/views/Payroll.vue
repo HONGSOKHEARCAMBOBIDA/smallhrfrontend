@@ -2,16 +2,24 @@
   <div>
     <AppFilterBar
       :fields="[
-        { slot: 'payrollType', span: 10 },
+        { slot: 'payrollType', span: 5 },
+        {slot: 'company',span: 6},
         { slot: 'getdraft', span: 6 },
         { slot: 'createpayroll', span: 5 },
       ]"
-      :action-span="3"
+      :action-span="4"
     >
       <template #payrollType>
         <el-select v-model="payrollType" @change="fetchDraft" size="large">
           <el-option label="បេីកពេញ១ខែ" :value="1" />
           <el-option label="បេីកកន្លះខែ" :value="2" />
+        </el-select>
+      </template >
+
+      <template #company>
+        <el-select v-model="selectcompany" placeholder="ក្រុមហ៑ុន" clearable style="width: 100%" size="large"
+          @change="fetchDraft">
+          <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
         </el-select>
       </template>
       <template #getdraft>
@@ -129,7 +137,7 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage } from "element-plus";
-import { getPayrollDraft, createPayroll } from "../api/services";
+import { getPayrollDraft, createPayroll,getCompany } from "../api/services";
 import AppTable from "../../components/AppTable.vue";
 import AppButton from "../../components/AppButton.vue";
 import AppDialog from "../../components/AppDialog.vue";
@@ -138,19 +146,37 @@ const draft = ref([]);
 const draftLoading = ref(false);
 const paying = ref(false);
 const payrollType = ref(1);
+const selectcompany = ref()
 const selectedRows = ref([]);
 const payDialog = ref(false);
-
+const companys = ref([]);
+const loading = ref(false);
 const payForm = reactive({
   payroll_date: new Date().toISOString().split("T")[0],
   payroll_type: 1,
   note: "",
 });
 
+async function fetchCompany() {
+  loading.value = true;
+  try {
+    const res = await getCompany();
+    companys.value = res.data.data || [];
+  } catch {
+    ElMessage.error("Failed to load employees");
+  } finally {
+    loading.value = false;
+  }
+}
+
+
 async function fetchDraft() {
   draftLoading.value = true;
   try {
-    const res = await getPayrollDraft({ payroll_type: payrollType.value });
+    const res = await getPayrollDraft({ 
+      payroll_type: payrollType.value,
+      company_id : selectcompany.value
+    });
     draft.value = res.data.data || [];
   } catch (e) {
     ElMessage.error(
@@ -197,7 +223,9 @@ async function submitPayroll() {
   }
 }
 
-onMounted(fetchDraft);
+onMounted(()=>{
+  fetchCompany();
+});
 </script>
 
 <style scoped>

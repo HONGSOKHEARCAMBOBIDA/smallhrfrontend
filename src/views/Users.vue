@@ -260,6 +260,45 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :xs="24" :sm="12">
+        <el-form-item label="សិទ្ធ">
+          <el-select
+            v-model="editForm.manage_company"
+            placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៊ុន"
+            clearable
+            size="large"
+            style="width: 100%"
+          >
+            <el-option
+
+              v-for="managecp in managecompany"
+              :key="managecp.id"
+              :label="managecp.name"
+              :value="managecp.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+          <el-col :xs="24" :sm="12">
+        <el-form-item label="សាខាដែលអាចមើលទិន្នន័យ">
+          <el-select
+            :disabled="editForm.manage_company != 2"
+            v-model="editForm.company_ids"
+            placeholder="ជ្រើសរើស"
+            multiple
+            clearable
+            size="large"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="cp in companys"
+              :key="cp.id"
+              :label="cp.name"
+              :value="cp.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
         </el-row>
       </el-form>
       <template #footer>
@@ -605,6 +644,8 @@ const editForm = reactive({
   base_salary: "",
   role_id: null,
   company_id: null,
+  manage_company: null,
+  company_ids: []
 });
 
 function addShift() {
@@ -760,6 +801,8 @@ async function handleCreate() {
       gender: createForm.gender,
       base_salary: createForm.base_salary,
       company_id: createForm.company_id,
+      manage_company: createForm.manage_company,
+      company_ids: createForm.company_ids,
       day: createForm.shifts.map((s) => s.day),
       shift_type: createForm.shifts.map((s) => s.shift_type),
       check_in1: createForm.shifts.map((s) => s.check_in1 || null),
@@ -788,6 +831,8 @@ function openEdit(row) {
     base_salary: row.base_salary,
     role_id: row.role_id,
     company_id: row.company_id,
+    manage_company: row.manage_company,
+    company_ids: row.company_ids
   });
   editDialog.value = true;
 }

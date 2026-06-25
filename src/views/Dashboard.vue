@@ -48,8 +48,10 @@
       <AppTable
         :data="recentAttendance"
         :loading="loading"
-        :total="recentAttendance.length"
-        @page-change="getAttendance"
+        v-model:current-page="page"
+        v-model:page-size="pageSize"
+        :total="total"
+        @page-change="loadAttendance()"
         :columns="[
           { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
           { prop: 'gender_string', label: 'ភេទ', minWidth: 90 },
@@ -154,15 +156,17 @@ const stats = ref([
 const recentAttendance = ref([])
 const recordsDialog = ref(false);
 const selectedRow = ref(null);
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 async function loadAttendance() {
   loading.value = true
 
   try {
-    const res = await getAttendance({
-      check_date: today
-    })
-
-    recentAttendance.value = res.data.data || []
+    const params = {page: page.value,page_size: pageSize.value,check_date: today};
+    const res = await getAttendance(params)
+    recentAttendance.value = res.data.data || [];
+    total.value = res.data.pagination?.totalCount || 0;
   } catch (e) {
     ElNotification({
       title: 'មានបញ្ហា',

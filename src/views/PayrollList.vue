@@ -2,11 +2,12 @@
   <div>
     <AppFilterBar
       :fields="[
-        { slot: 'name', span: 10 },
+        { slot: 'name', span: 7 },
         { slot: 'payroll_type', span: 6 },
+        {slot: 'company',span: 5},
         { slot: 'payroll_date', span: 5 },
       ]"
-      :action-span="3"
+      :action-span="4"
     >
       <template #name>
         <el-input
@@ -28,6 +29,12 @@
           <el-option label="បេីកពេញ១ខែ" :value="1" />
           <el-option label="បេីកកន្លះខែ" :value="2" />
         </el-select>
+      </template>
+      <template #company>
+          <el-select v-model="filters.company_id" placeholder="ក្រុមហ៑ុន" clearable style="width: 100%" size="large"
+          @change="fetchPayroll">
+          <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
+        </el-select>      
       </template>
       <template #payroll_date>
         <el-date-picker
@@ -142,7 +149,7 @@
 <script setup>
 import { ref, reactive, onMounted, watch, computed } from "vue";
 import { ElMessage } from "element-plus";
-import { getPayroll } from "../api/services";
+import { getPayroll,getCompany } from "../api/services";
 import { debounce } from "lodash-es";
 import AppButton from "../../components/AppButton.vue";
 import AppDialog from "../../components/AppDialog.vue";
@@ -151,12 +158,26 @@ import AppFilterBar from "../../components/AppFilterBar.vue";
 const payrolls = ref([]);
 const loading = ref(false);
 const totalCount = ref(0);
-
+const companys = ref([])
+const selectcompany = ref()
 const filters = reactive({
   name: "",
-  payroll_date: "",
+  payroll_date: new Date().toISOString().slice(0, 7),
   payroll_type: "",
+  company_id: null
 });
+
+async function fetchCompany() {
+  loading.value = true;
+  try {
+    const res = await getCompany();
+    companys.value = res.data.data || [];
+  } catch {
+    ElMessage.error("Failed to load employees");
+  } finally {
+    loading.value = false;
+  }
+}
 
 const pagination = reactive({
   page: 1,
@@ -170,6 +191,7 @@ async function fetchPayroll() {
     if (filters.name) params.name = filters.name;
     if (filters.payroll_date) params.payroll_date = filters.payroll_date;
     if (filters.payroll_type) params.payroll_type = filters.payroll_type;
+    if(filters.company_id) params.company_id = filters.company_id
     const res = await getPayroll(params);
     payrolls.value = res.data.data || [];
     totalCount.value = res.data.pagination?.totalCount || 0;
@@ -185,7 +207,10 @@ const debouncedFetch = debounce(() => {
   fetchPayroll();
 }, 500);
 watch(() => filters.name, debouncedFetch);
-onMounted(fetchPayroll);
+onMounted(()=>{
+  fetchPayroll()
+  fetchCompany()
+});
 </script>
 
 <style scoped>

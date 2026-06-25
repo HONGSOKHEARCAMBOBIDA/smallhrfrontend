@@ -4,11 +4,15 @@
       <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <el-text style="color: black; font-size: 18px; font-weight: bold;">វត្តមាន</el-text>
       </div>
-      <el-text style="color: black; font-size: 18px; font-weight: bold;">
+<el-row justify="space-between" align="middle">
+        <el-text style="color: black; font-size: 18px; font-weight: bold;">
         {{ new Date().toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
       </el-text>
+      <AppButton type="success"  size="large" @click="getLocation()"  icon="MapLocation">
+        ទាញទីតាំង
+      </AppButton>
+</el-row>
     </template>
-
     <el-form :model="attendForm">
       <el-form-item label="មូលហេតុ" :required="reasonRequired">
         <el-input
@@ -67,7 +71,8 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { createAttendance, getAttendanceDraft } from '../api/services'
-
+import { ElNotification } from 'element-plus'
+import AppButton from "../../components/AppButton.vue";
 const now = ref(new Date())
 const currentTime = ref('')
 const loading = ref(false)
@@ -123,15 +128,44 @@ async function fetchDraft() {
   }
 }
 
+// function getLocation() {
+//   if (!navigator.geolocation) return ElMessage.warning('Geolocation not supported')
+//   navigator.geolocation.getCurrentPosition(
+//     (pos) => {
+//       attendForm.latitude = String(pos.coords.latitude)
+//       attendForm.longitude = String(pos.coords.longitude)
+//     },
+//     () => ElMessage.error('Failed to get location')
+//   )
+// }
+
 function getLocation() {
-  if (!navigator.geolocation) return ElMessage.warning('Geolocation not supported')
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      attendForm.latitude = String(pos.coords.latitude)
-      attendForm.longitude = String(pos.coords.longitude)
-    },
-    () => ElMessage.error('Failed to get location')
-  )
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      ElNotification({
+    title: 'មានបញ្ហាទីតាំង',
+    message: 'Geolocation not supported',
+    type: 'error',
+  })
+      return reject()
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        attendForm.latitude = String(pos.coords.latitude)
+        attendForm.longitude = String(pos.coords.longitude)
+        resolve()
+      },
+      () => {
+         ElNotification({
+    title: 'មានបញ្ហាទីតាំង',
+    message: 'ចាប់ទីតាំងមិនបាន',
+    type: 'error',
+  })
+        reject()
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
+  })
 }
 
 function updateTime() {
@@ -145,15 +179,30 @@ async function handleCheckIn() {
   if (reasonMissing.value) {
     return ElMessage.warning('សូមបញ្ចូលមូលហេតុជាមុនសិន')
   }
+  if (!attendForm.latitude || !attendForm.longitude) {
+    return ElNotification({
+    title: 'មានបញ្ហាទីតាំង',
+    message: 'មិនអាចទទួលបានទីតាំង សូមបើកការអនុញ្ញាត GPS',
+    type: 'error',
+  })
+  }
   loading.value = true
   try {
     await createAttendance(attendForm)
-    ElMessage.success('ចុះវត្តមានបានជោគជ័យ')
+      ElNotification({
+    title: 'ជោគជ័យ',
+    message: 'ចុះវត្តមានបានជោគជ័យ',
+    type: 'success',
+  })
     attendForm.reason = ''
     // Refresh draft so the button updates to the next session
     await fetchDraft()
   } catch (e) {
-    ElMessage.error(e.response?.data?.error || 'Sorry Something went wrong')
+    ElNotification({
+    title: 'មានបញ្ហា',
+    message:  e.response?.data?.error || "",
+    type: 'error',
+  })
   } finally {
     loading.value = false
   }
