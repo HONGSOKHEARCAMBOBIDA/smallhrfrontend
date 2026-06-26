@@ -142,6 +142,9 @@
                   <el-radio-button :value="0">មិនអាចស្កែនបាន</el-radio-button>
                 </el-radio-group>
               </el-form-item>
+              <el-form-item label="Color">
+                <el-color-picker-panel v-model="form.color" />
+              </el-form-item>
             </div>
           </template>
           <template #penalty>
@@ -244,12 +247,14 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage } from "element-plus";
+import { useCompanyStore } from '../stores/company'
 import {
   getCompany,
   createCompany,
   updateCompany,
   updateTelegram,
 } from "../api/services";
+const companyStore = useCompanyStore()
 import { useAuthStore } from "../stores/auth";
 import AppTable from "../../components/AppTable.vue";
 import AppButton from "../../components/AppButton.vue";
@@ -281,6 +286,7 @@ const form = reactive({
   bot_token: "",
   group_link: "",
   can_scan_outsize: null,
+  color: ""
 });
 
 const canAddCompany = computed(() =>
@@ -345,6 +351,7 @@ function openEdit(row) {
     late_penalty: row.late_penalty || "",
     left_early_penalty: row.left_early_penalty || "",
     can_scan_outsize: row.can_scan_outsize ?? null,
+    color: row.color || ""
   });
   dialogVisible.value = true;
 }
@@ -373,6 +380,9 @@ async function handleSave() {
         payload.can_scan_outsize = form.can_scan_outsize;
       }
       await updateCompany(editId.value, payload);
+            if (form.color) {
+        companyStore.setColor(form.color);
+      }
       ElMessage.success("កែប្រែបានជោគជ័យ");
     } else {
       await createCompany(form);

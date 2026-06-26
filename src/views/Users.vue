@@ -979,10 +979,7 @@ onMounted(() => {
   margin-bottom: 8px;
 }
 
-:deep(.el-table__header-wrapper th) {
-  background-color: #4589ce !important;
-  color: #ffffff !important;
-}
+
 
 .shift-dialog .el-dialog__header {
   padding: 20px 24px;

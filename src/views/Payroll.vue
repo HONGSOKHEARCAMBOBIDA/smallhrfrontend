@@ -236,8 +236,5 @@ onMounted(()=>{
   font-weight: 600;
   font-size: 15px;
 }
-:deep(.el-table__header-wrapper th) {
-  background-color: #4589ce !important;
-  color: #ffffff !important;
-}
+
 </style>

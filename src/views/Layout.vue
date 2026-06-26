@@ -1,12 +1,12 @@
 <template>
-  <div class="layout">
+  <div class="layout" :style="{ '--brand-color': companyStore.color || '#1a1a2e' }">
     <aside class="sidebar" :class="{ collapsed }">
       <div class="sidebar-header">
         <el-icon size="26" color="#fff"><UserFilled /></el-icon>
         <span v-if="!collapsed" class="brand">ប្រព័ន្ធគ្រប់គ្រងធនធានមនុស្ស</span>
       </div>
       <el-menu :default-active="$route.path" router :collapse="collapsed"
-        background-color="#1a1a2e" text-color="#a0a8c0" active-text-color="#fff">
+        background-color="var(--brand-color)" text-color="#a0a8c0" active-text-color="#fff">
         <el-menu-item v-for="n in nav" :key="n.path" :index="n.path">
           <el-icon><component :is="n.icon" /></el-icon>
           <template #title>{{ n.label }}</template>
@@ -47,10 +47,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-
+import { useCompanyStore } from '../stores/company'
+import { ElMessage } from 'element-plus'
+const companyStore = useCompanyStore()
+const loading = ref(false)
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
@@ -73,6 +76,9 @@ const pageTitle = computed(() => nav.value.find(n => n.path === route.path)?.lab
 function handleCommand(cmd) {
   cmd === 'logout' ? (auth.logout(), router.push('/login')) : router.push('/profile')
 }
+onMounted(() => {
+  companyStore.fetchColor()
+})
 </script>
 
 <style scoped>
@@ -80,7 +86,7 @@ function handleCommand(cmd) {
 
 
 /* Sidebar */
-.sidebar { width: 260px; background: #1a1a2e; display: flex; flex-direction: column; transition: width .3s; overflow: hidden; flex-shrink: 0; }
+.sidebar { width: 260px; background: var(--brand-color, #1a1a2e); display: flex; flex-direction: column; transition: width .3s; overflow: hidden; flex-shrink: 0; }
 .sidebar.collapsed { width: 64px; }
 .sidebar-header { display: flex; align-items: center; gap: 10px; padding: 18px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
 .brand { color: #fff; font-size: 15px; font-weight: 700; white-space: nowrap; }

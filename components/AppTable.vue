@@ -1,5 +1,5 @@
 <template>
-  <div class="app-table">
+  <div class="app-table" :style="{'--brand-color':companyStore.color || '#4589ce'}">
 <el-table
   v-if="!isMobile"
   ref="tableRef"
@@ -85,7 +85,9 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted,watch } from "vue";
-
+// import { useCompanyStore } from '../stores/company'
+import { useCompanyStore } from "../src/stores/company";
+const companyStore = useCompanyStore()
 const props = defineProps({
   data: { type: Array, default: () => [] },
   columns: { type: Array, required: true },
@@ -123,7 +125,10 @@ const windowWidth = ref(window.innerWidth);
 function onResize() {
   windowWidth.value = window.innerWidth;
 }
-onMounted(() => window.addEventListener("resize", onResize));
+onMounted(() => {
+  window.addEventListener("resize", onResize)
+  companyStore.fetchColor()
+})
 onUnmounted(() => window.removeEventListener("resize", onResize));
 
 const isMobile = computed(() => windowWidth.value <= props.mobileBreakpoint);
@@ -161,7 +166,7 @@ watch(
 }
 
 :deep(.el-table__header-wrapper th) {
-  background-color: #4589ce !important;
+  background-color: var(--brand-color,#4589ce);
   color: #ffffff !important;
 }
 

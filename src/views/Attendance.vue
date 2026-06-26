@@ -261,10 +261,7 @@ onMounted(fetchAttendance);
   display: flex;
   justify-content: flex-end;
 }
-:deep(.el-table__header-wrapper th) {
-  background-color: #4589ce !important;
-  color: #ffffff !important;
-}
+
 .detail-action {
   padding: 10px 0;
 }
