@@ -1,80 +1,149 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
 const routes = [
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/Login.vue'),
-    meta: { public: true }
+    path: "/login",
+    name: "Login",
+    component: () => import("../views/Login.vue"),
+    meta: { public: true },
   },
   {
-    path: '/',
-    component: () => import('../views/Layout.vue'),
-    redirect: '/dashboard',
+    path: "/",
+    component: () => import("../views/Layout.vue"),
+    redirect: "/dashboard",
     children: [
       {
-        path: 'dashboard',
-        name: 'Dashboard',
-        component: () => import('../views/Dashboard.vue')
+        path: "dashboard",
+        name: "Dashboard",
+        component: () => import("../views/Dashboard.vue"),
+        meta: {
+          title: "សង្ខែបទិន្ន័យ",
+          icon: "Odometer",
+          short: "ទិន្ន័យ",
+          showInNav: true,
+        },
       },
       {
-        path: 'company',
-        name: 'Company',
-        component: () => import('../views/Company.vue')
+        path: "company",
+        name: "Company",
+        component: () => import("../views/Company.vue"),
+        meta: {
+          title: "ក្រុមហ៑ុន",
+          icon: "OfficeBuilding",
+          short: "ក្រុមហ៑ុន",
+          showInNav: true,
+        },
       },
       {
-        path: 'users',
-        name: 'Users',
-        component: () => import('../views/Users.vue')
+        path: "users",
+        name: "Users",
+        component: () => import("../views/Users.vue"),
+        meta: {
+          title: "បុគ្គលិក",
+          icon: "User",
+          short: "បុគ្គលិក",
+          showInNav: true,
+        },
       },
       {
-        path: 'attendance',
-        name: 'Attendance',
-        component: () => import('../views/Attendance.vue')
+        path: "attendance",
+        name: "Attendance",
+        component: () => import("../views/Attendance.vue"),
+        meta: {
+          title: "វត្តមាន",
+          icon: "Clock",
+          short: "វត្តមាន",
+          showInNav: true,
+        },
       },
       {
-        path: 'payroll',
-        name: 'Payroll',
-        component: () => import('../views/Payroll.vue')
+        path: "payroll",
+        name: "Payroll",
+        component: () => import("../views/Payroll.vue"),
+        meta: {
+          title: "បេីកប្រាក់ខែ",
+          icon: "Money",
+          short: "បេីកប្រាក់ខែ",
+          permission: "add.payroll",
+          showInNav: true,
+        },
       },
       {
-        path: 'payrolllist',
-        name: 'Payrolllist',
-        component: () => import('../views/PayrollList.vue')
+        path: "payrolllist",
+        name: "Payrolllist",
+        component: () => import("../views/PayrollList.vue"),
+        meta: {
+          title: "ប្រាក់ខែ",
+          icon: "Money",
+          short: "ប្រាក់ខែ",
+          showInNav: true,
+        },
       },
       {
-        path: 'createattendance',
-        name: 'CreateAttendance',
-        component: () => import('../views/CreateAttendance.vue')
+        path: "createattendance",
+        name: "CreateAttendance",
+        component: () => import("../views/CreateAttendance.vue"),
+        meta: { title: "បង្កេីតវត្តមាន" }, // no showInNav -> hidden from sidebar
       },
       {
-        path: 'profile',
-        name: 'Profile',
-        component: () => import('../views/Profile.vue')
+        path: "profile",
+        name: "Profile",
+        component: () => import("../views/Profile.vue"),
+        meta: {
+          title: "ប្រវត្តរូប",
+          icon: "Setting",
+          short: "ប្រវត្តរូប",
+          showInNav: true,
+        },
       },
       {
-        path: 'backup',
-        name: 'Backup',
-        component: () => import('../views/Backup.vue')
-      }
-    ]
+        path: "backup",
+        name: "Backup",
+        component: () => import("../views/Backup.vue"),
+        meta: {
+          title: "Backup",
+          icon: "Download",
+          short: "Backup",
+          permission: "view.backup",
+          showInNav: true,
+        },
+      },
+      {
+        path: "/:pathMatch(.*)*",
+        name: "NotFound",
+        component: () => import("../views/NotFound.vue"),
+      },
+    ],
   },
-]
+];
 
 const router = createRouter({
+  linkActiveClass: "font-bold",
+  linkExactActiveClass: "font-bold",
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
 router.beforeEach((to) => {
-  const auth = useAuthStore()
+  const auth = useAuthStore();
   if (!to.meta.public && !auth.isLoggedIn) {
-    return { name: 'Login' }
+    return { name: "Login" };
   }
-  if (to.name === 'Login' && auth.isLoggedIn) {
-    return { name: 'Dashboard' }
+  if (to.name === "Login" && auth.isLoggedIn) {
+    return { name: "Dashboard" };
   }
-})
+  if (to.meta.permission) {
+    const hasPermission = auth.permission?.some(
+      (p) => p.name === to.meta.permission,
+    );
+    if (!hasPermission) {
+      return { name: "Dashboard" };
+    }
+  }
+  if (to.meta.title) {
+    document.title = to.meta.title;
+  }
+});
 
-export default router
+export default router;
