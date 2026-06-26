@@ -33,7 +33,7 @@
     <el-card>
       <AppTable :data="users" :loading="loading" show-index v-model:current-page="page" v-model:page-size="pageSize"
         :total="total" @page-change="fetchUsers" :columns="[
-          { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
+          { slot: 'name', label: 'ឈ្មោះ', minWidth: 110 },
           { prop: 'gender_string', label: 'ភេទ', minWidth: 90 },
           { prop: 'phone_hash', label: 'លេខទូរសព្ទ', minWidth: 130 },
           { prop: 'role_name', label: 'តួនាទី', minWidth: 110 },
@@ -42,6 +42,20 @@
           { prop: 'base_salary', label: 'ប្រាក់ខែ', width: 120 },
           { label: 'ស្ថានភាព', slot: 'status', width: 100 },
         ]" actionsWidth="200">
+<template #name="{ row }">
+  <span class="name-cell">
+    {{ row.name }}
+    <el-tooltip v-if="row.is_verify" content="Verified" placement="top">
+      <el-icon class="verified-badge" :size="20">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L9.5 4.5 6 4l-1 3.5L1.5 9 3 12l-1.5 3L6 16.5l-1 3.5 3.5.5L12 22l2.5-2.5 3.5-.5-1-3.5L20.5 15 19 12l1.5-3-3.5-1.5L16 4l-3.5.5L12 2z"/>
+          <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </el-icon>
+    </el-tooltip>
+  </span>
+</template>
+
         <template #qrtoken="{ row }">
           <el-button type="primary" link @click="openQR(row.qr_token)">
             View QR
@@ -489,6 +503,7 @@ import AppDialog from "../../components/AppDialog.vue";
 import AppFilterBar from "../../components/AppFilterBar.vue";
 import AppTabs from "../../components/AppTabs.vue";
 import AppInput from "../../components/AppInput.vue";
+import { CircleCheckFilled } from '@element-plus/icons-vue'
 const shiftsCreateDialog = ref(false);
 const newShifts = ref([]);
 const qrDialog = ref(false);
@@ -1005,6 +1020,16 @@ onMounted(() => {
 .qr-box img {
   width: 170px;
   height: 170px;
+}
+
+.name-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.verified-badge {
+  color: #1d9bf0;
+  display: inline-flex;
 }
 
 @media (max-width: 768px) {

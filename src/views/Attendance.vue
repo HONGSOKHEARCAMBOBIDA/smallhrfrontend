@@ -96,7 +96,7 @@
               :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
             >
               <el-button
-                size="small"
+                size="large"
                 icon="List"
                 circle
                 @click="viewRecords(row)"
