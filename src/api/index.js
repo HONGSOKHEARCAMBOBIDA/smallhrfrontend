@@ -20,24 +20,60 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+let isRefreshing = false
+let failedQueue = []
+
+function processQueue(error, token = null) {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error)
+    } else {
+      resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
+
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const auth = useAuthStore()
     const original = error.config
-    if   (error.response?.status === 401 && !original._retry) {
+
+    if (error.response?.status === 401 && !original._retry) {
+      if (isRefreshing) {
+        // queue this request until the in-flight refresh finishes
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        }).then((token) => {
+          original.headers.Authorization = `Bearer ${token}`
+          return api(original)
+        }).catch((err) => Promise.reject(err))
+      }
+
       original._retry = true
+      isRefreshing = true
+
       try {
         await auth.refresh()
-      //  original.headers.Authorization = `Bearer ${auth.accessToken}`
+        const newToken = auth.accessToken
+        processQueue(null, newToken)
+        original.headers.Authorization = `Bearer ${newToken}`
         return api(original)
-      } catch {
+      } catch (refreshError) {
+        processQueue(refreshError, null)
         auth.logout()
         window.location.href = '/login'
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
       }
     }
+
     return Promise.reject(error)
   }
 )
+
 
 export default api

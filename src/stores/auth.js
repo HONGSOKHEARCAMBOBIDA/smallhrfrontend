@@ -22,7 +22,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function refresh() {
-    const res = await refreshToken({ refresh_token: refreshTokenVal.value })
+  //  const res = await refreshToken({ refresh_token: refreshTokenVal.value })
+  const res = await refreshToken({})
     const resData = res.data.data
 
     accessToken.value = resData.access_token

@@ -3,7 +3,7 @@ import api from './index'
 // Auth
 export const login = (data) => api.post('/login', data)
 export const loginByQr = (data) => api.post('/loginbyqr', data)
-export const refreshToken = (data) => api.post('/refresh', data)
+export const refreshToken = (data) => api.post('/refresh',{}, { withCredentials: true })
 
 // Company
 export const getCompany = (params) => api.get('/view.company', { params })
