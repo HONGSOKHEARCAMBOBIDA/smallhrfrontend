@@ -2,12 +2,13 @@
   <div>
     <AppFilterBar
       :fields="[
-        { slot: 'name', span: 7 },
+        { slot: 'name', span: 5 },
         { slot: 'payroll_type', span: 6 },
         {slot: 'company',span: 5},
         { slot: 'payroll_date', span: 5 },
+        {slot: 'delete_payroll',span:3}
       ]"
-      :action-span="4"
+      :action-span="5"
     >
       <template #name>
         <el-input
@@ -48,12 +49,25 @@
           style="width: 100%;"
         />
       </template>
+      <template #delete_payroll>
+        <AppButton
+        v-if="candeletepayroll"
+        type="danger"
+        @click="confirmDeletePayroll"
+        :disabled="!selectedRows.length"
+        :loading="loading"
+        :block="true"
+        >
+        លុប
+        </AppButton>
+      </template>
     </AppFilterBar>
     <el-card class="top-card">
       <AppTable
       :data="payrolls"
       :loading="loading"
       show-index
+      selectable
       :total="totalCount"
       v-model:current-page="page"
       v-model:page-size="pageSize"
@@ -74,6 +88,7 @@
         {prop: 'payroll_date',label:'កាលបរិច្ឆេទ',width: 120},
         {label: 'សម្គាល់',slot: 'note',width: 120},
       ]"
+      @selection-change="(rows) => (selectedRows = rows)"
       >
       <template #gender="{ row }">
             <el-tag
@@ -118,29 +133,46 @@
             <span v-else>—</span>
           </template>
       </AppTable>
-      <!-- <div style="display: flex; justify-content: flex-end; margin-top: 16px">
-        <el-pagination
-          v-model:current-page="pagination.page"
-          v-model:page-size="pagination.pageSize"
-          :total="totalCount"
-          :page-sizes="[10, 20, 50]"
-          layout="total, sizes, prev, pager, next"
-          @change="fetchPayroll"
-        />
-      </div> -->
     </el-card>
+    <AppDialog v-model="deleteDialog" title="ពិនិត្យប្រាក់ខែម្ដងទៀត" width="720px">
+         <el-alert
+        title="សូមពិនិត្យព័ត៌មានប្រាក់បៀវត្សរ៍ឱ្យបានត្រឹមត្រូវ មុនពេលលុប!"
+        type="warning"
+        show-icon
+        :closable="false"
+        style="margin-bottom: 16px"
+      />   
+      <el-table :data="selectedRows" size="large" max-height="400">
+        <el-table-column prop="user_name" label="ឈ្មោះបុគ្គលិក" />
+        <el-table-column prop="net_salary" label="ប្រាក់ខែទទួលបាន" width="150">
+          <template #default="{ row }"
+            >{{ row.net_salary }} {{ row.currency }}</template
+          >
+        </el-table-column>
+      </el-table>
+          <template #footer>
+        <el-button @click="deleteDialog = false">Cancel</el-button>
+        <el-button type="danger" :loading="loading" @click="deletepayroll"
+          >Delete</el-button
+        >
+      </template>
+    </AppDialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, watch, computed } from "vue";
 import { ElMessage } from "element-plus";
-import { getPayroll,getCompany } from "../api/services";
+import { getPayroll,getCompany,deletePayroll } from "../api/services";
 import { debounce } from "lodash-es";
 import AppButton from "../../components/AppButton.vue";
 import AppDialog from "../../components/AppDialog.vue";
 import AppTable from "../../components/AppTable.vue";
 import AppFilterBar from "../../components/AppFilterBar.vue";
+import { ElNotification } from 'element-plus'
+import { useAuthStore } from "../stores/auth.js";
+const permission = useAuthStore();
+const candeletepayroll = computed(()=>permission.permission?.some((p)=> p.name === "edit.payroll"));
 const payrolls = ref([]);
 const loading = ref(false);
 const page = ref(1);
@@ -148,12 +180,24 @@ const pageSize = ref(10);
 const totalCount = ref(0);
 const companys = ref([])
 const selectcompany = ref()
+const selectedRows = ref([]);
+const deleteDialog = ref(false)
 const filters = reactive({
   name: "",
   payroll_date: new Date().toISOString().slice(0, 7),
   payroll_type: "",
   company_id: null
 });
+
+function confirmDeletePayroll(){
+  if(!selectedRows.value.length)
+  return   ElNotification.error({
+    title: 'មានបញ្ហា',
+    message: 'ជ្រេីសរេីសតេីមួយណាដែលអ្នកចង់លុប',
+    offset: 100,
+  })
+  deleteDialog.value = true;
+}
 
 async function fetchCompany() {
   loading.value = true;
@@ -167,6 +211,29 @@ async function fetchCompany() {
   }
 }
 
+async function deletepayroll(){
+  loading.value = true;
+  try {
+const payroll_ids = selectedRows.value.map(r => r.id)
+    await deletePayroll({ payroll_ids })
+    ElNotification.success({
+      title: 'ជោគជ័យ',
+      message: 'លុបប្រាក់ខែបានជោគជ័យ',
+      offset: 100
+    });
+    deleteDialog.value = false;
+    selectedRows.value = [];
+    await fetchPayroll();
+  } catch (e) {
+    ElNotification.error({
+      title: 'មានបញ្ហា',
+      message: e.response?.data?.error || "",
+      offset: 100,
+    });
+  } finally {
+    loading.value = false;
+  }
+}
 
 
 async function fetchPayroll() {
@@ -188,7 +255,7 @@ async function fetchPayroll() {
 }
 
 const debouncedFetch = debounce(() => {
-  pagination.page = 1;
+  page.value = 1;
   fetchPayroll();
 }, 500);
 watch(() => filters.name, debouncedFetch);

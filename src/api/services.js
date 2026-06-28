@@ -22,6 +22,7 @@ export const deleteuser = (id) => api.delete(`/delete.user/${id}`)
 export const changePassword = (data) => api.put('/change.password', data)
 export const countuser = () => api.get('/count.user')
 export const getrole = () => api.get('/view.role')
+export const getuserdata = () => api.get(`/view.user.data`)
 
 // Shift
 export const createShift = (data) => api.post('/add.shift', data)
@@ -36,6 +37,8 @@ export const getAttendanceDraft = (params) => api.get('/view.attendance.draft')
 export const getPayrollDraft = (params) => api.get('/view.payroll.draft', { params })
 export const createPayroll = (data) => api.post('/add.payroll', data)
 export const getPayroll = (params) => api.get('/view.payroll',{params})
+export const deletePayroll = (data) =>
+  api.post('/delete.payroll',data)
 
 // Backup
 export const triggerBackup = () => api.post('add.backup')

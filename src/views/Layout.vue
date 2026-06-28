@@ -51,12 +51,15 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useCompanyStore } from '../stores/company'
+import { useUserDataStore } from '../stores/user_data'
 import { ElMessage } from 'element-plus'
 const companyStore = useCompanyStore()
 const loading = ref(false)
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const userdataStore = useUserDataStore()
+const userName = computed(() => userdataStore.name || 'User')
 const collapsed = ref(false)
 const userName = computed(() => auth.user?.name || 'User')
 const canAddPayroll = computed(() => auth.permission?.some(p => p.name === 'add.payroll'))
@@ -79,6 +82,7 @@ function handleCommand(cmd) {
 }
 onMounted(() => {
   companyStore.fetchColor()
+  userdataStore.getuserdata()
 })
 </script>
 

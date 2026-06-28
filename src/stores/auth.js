@@ -16,7 +16,6 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = { id: data.id, name: data.name }
     permission.value = data.permissions
     localStorage.setItem('access_token', data.access_token)
-    localStorage.setItem('refresh_token', data.refresh_token)
     localStorage.setItem('user', JSON.stringify({ id: data.id, name: data.name }))
     localStorage.setItem('permissions', JSON.stringify(data.permissions))
   }
@@ -31,7 +30,6 @@ export const useAuthStore = defineStore('auth', () => {
     permission.value = resData.permissions
 
     localStorage.setItem('access_token', resData.access_token)
-    localStorage.setItem('refresh_token', resData.refresh_token)
     localStorage.setItem('permissions', JSON.stringify(resData.permissions)) 
   }
   function logout() {
@@ -40,7 +38,6 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     permission.value = null
     localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
     localStorage.removeItem('user')
     localStorage.removeItem('permissions')
   }
