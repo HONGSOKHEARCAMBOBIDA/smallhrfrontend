@@ -1,9 +1,10 @@
 <template>
   <div>
     <AppFilterBar :fields="[
-      { slot: 'name', span: 10 },
+      { slot: 'name', span: 8 },
       { slot: 'role', span: 6 },
       { slot: 'company', span: 5 },
+      {slot: 'adduser',span: 5}
     ]" :action-span="3">
       <template #name>
         <!-- <el-input v-model="filters.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable @input="fetchUsers" /> -->
@@ -24,8 +25,8 @@
           <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
         </el-select>
       </template>
-      <template #actions>
-        <AppButton type="primary" @click="openCreate">
+      <template #adduser>
+        <AppButton v-if="candadd" type="primary" @click="openCreate">
           បន្ថែមបុគ្គលិក
         </AppButton>
       </template>
@@ -496,7 +497,8 @@ import { watch } from "vue";
 import { debounce } from "lodash-es";
 import QRCode from "qrcode";
 import { ElNotification } from "element-plus";
-import { useAuthStore } from "../stores/auth";
+// import { useAuthStore } from "../stores/auth";
+import { useUserDataStore } from '../stores/user_data'
 import AppTable from "../../components/AppTable.vue";
 import AppButton from "../../components/AppButton.vue";
 import AppDialog from "../../components/AppDialog.vue";
@@ -529,10 +531,13 @@ const day = ref(1);
 const shiftsEditMode = ref(false);
 const savingShifts = ref(false);
 const editableShifts = ref([]);
-const auth = useAuthStore();
+const userDataStore = useUserDataStore()
 const canedit = computed(() =>
-  auth.permission?.some((p) => p.name === "edit.user"),
+  userDataStore.permissions?.some((p) => p.name === "edit.user"),
 );
+const candadd = computed(()=>
+  userDataStore.permissions?.some((p) => p.name === "add.user")
+)
 const activeTab = ref("general");
 const days = [
   "ចន្ទ",

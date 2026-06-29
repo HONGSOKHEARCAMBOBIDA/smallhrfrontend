@@ -61,13 +61,10 @@ const auth = useAuthStore()
 const userdataStore = useUserDataStore()
 const userName = computed(() => userdataStore.name || 'User')
 const collapsed = ref(false)
-const userName = computed(() => auth.user?.name || 'User')
-const canAddPayroll = computed(() => auth.permission?.some(p => p.name === 'add.payroll'))
-const canViewBackup = computed(() => auth.permission?.some(p => p.name === 'view.backup'))
 const nav = computed(() => {
   return router.getRoutes()
     .filter(r => r.meta?.showInNav)
-    .filter(r => !r.meta?.permission || auth.permission?.some(p => p.name === r.meta.permission))
+    .filter(r => !r.meta?.permission || userdataStore.permissions?.some(p => p.name === r.meta.permission))
     .map(r => ({
       path: r.path, // getRoutes() returns full resolved paths already
       icon: r.meta.icon,

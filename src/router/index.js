@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "../stores/auth";
-
+import { useUserDataStore } from '../stores/user_data'
+import { useAuthStore } from "../stores/auth.js";
 const routes = [
   {
     path: "/login",
@@ -126,7 +126,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  const auth = useAuthStore();
+  const userDataStore = useUserDataStore();
+  const auth = useAuthStore()
   if (!to.meta.public && !auth.isLoggedIn) {
     return { name: "Login" };
   }
@@ -134,11 +135,11 @@ router.beforeEach((to) => {
     return { name: "Dashboard" };
   }
   if (to.meta.permission) {
-    const hasPermission = auth.permission?.some(
+    const hasPermission = userDataStore.permissions?.some(
       (p) => p.name === to.meta.permission,
     );
     if (!hasPermission) {
-      return { name: "Dashboard" };
+      return { name: "NotFound" };
     }
   }
   if (to.meta.title) {

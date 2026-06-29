@@ -171,8 +171,9 @@ import AppTable from "../../components/AppTable.vue";
 import AppFilterBar from "../../components/AppFilterBar.vue";
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from "../stores/auth.js";
-const permission = useAuthStore();
-const candeletepayroll = computed(()=>permission.permission?.some((p)=> p.name === "edit.payroll"));
+import { useUserDataStore } from '../stores/user_data'
+const userDataStore = useUserDataStore()
+const candeletepayroll = computed(()=>userDataStore.permissions?.some((p)=> p.name === "edit.payroll"));
 const payrolls = ref([]);
 const loading = ref(false);
 const page = ref(1);

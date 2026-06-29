@@ -248,18 +248,20 @@
 import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage } from "element-plus";
 import { useCompanyStore } from '../stores/company'
+import { useUserDataStore } from '../stores/user_data'
 import {
   getCompany,
   createCompany,
   updateCompany,
   updateTelegram,
 } from "../api/services";
-const companyStore = useCompanyStore()
 import { useAuthStore } from "../stores/auth";
 import AppTable from "../../components/AppTable.vue";
 import AppButton from "../../components/AppButton.vue";
 import AppDialog from "../../components/AppDialog.vue";
 import AppTabs from "../../components/AppTabs.vue";
+const userDataStore = useUserDataStore()
+const companyStore = useCompanyStore()
 const companies = ref([]);
 const loading = ref(false);
 const saving = ref(false);
@@ -290,10 +292,10 @@ const form = reactive({
 });
 
 const canAddCompany = computed(() =>
-  auth.permission?.some((p) => p.name === "add.company"),
+  userDataStore.permissions?.some((p) => p.name === "add.company"),
 );
 const canEditCompany = computed(() =>
-  auth.permission?.some((p) => p.name === "edit.company"),
+  userDataStore.permissions?.some((p) => p.name === "edit.company"),
 );
 
 const rules = {

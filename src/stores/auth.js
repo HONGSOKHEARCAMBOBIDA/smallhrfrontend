@@ -16,8 +16,8 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = { id: data.id, name: data.name }
     permission.value = data.permissions
     localStorage.setItem('access_token', data.access_token)
-    localStorage.setItem('user', JSON.stringify({ id: data.id, name: data.name }))
-    localStorage.setItem('permissions', JSON.stringify(data.permissions))
+    // localStorage.setItem('user', JSON.stringify({ id: data.id, name: data.name }))
+  //  localStorage.setItem('permissions', JSON.stringify(data.permissions))
   }
 
   async function refresh() {
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
     permission.value = resData.permissions
 
     localStorage.setItem('access_token', resData.access_token)
-    localStorage.setItem('permissions', JSON.stringify(resData.permissions)) 
+ //   localStorage.setItem('permissions', JSON.stringify(resData.permissions)) 
   }
   function logout() {
     accessToken.value = ''
@@ -38,8 +38,8 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     permission.value = null
     localStorage.removeItem('access_token')
-    localStorage.removeItem('user')
-    localStorage.removeItem('permissions')
+    // localStorage.removeItem('user')
+ //   localStorage.removeItem('permissions')
   }
 
   return { accessToken, refreshTokenVal, user, isLoggedIn, setAuth, refresh, logout,permission }

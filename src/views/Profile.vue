@@ -6,10 +6,10 @@
         <el-card class="profile-card">
           <div class="profile-avatar-section">
             <el-avatar :size="90" style="background: linear-gradient(135deg, #667eea, #764ba2); font-size:32px">
-              {{ auth.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+              {{ userName?.charAt(0)?.toUpperCase() || 'U' }}
             </el-avatar>
-            <h2>{{ auth.user?.name }}</h2>
-            <p class="profile-id">User ID: {{ auth.user?.id }}</p>
+            <h2>{{ userName }}</h2>
+            <p class="profile-id">User ID: {{ userdataStore.userdata?.id }}</p>
           </div>
         </el-card>
       </el-col>
@@ -45,16 +45,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useAuthStore } from '../stores/auth'
+import { useUserDataStore } from '../stores/user_data'
 import { changePassword } from '../api/services'
 
-const auth = useAuthStore()
+
 const pwFormRef = ref()
 const changingPw = ref(false)
-
+const userdataStore = useUserDataStore()
 // Track viewport for label position / width switching
+const userName = computed(() => userdataStore.name || 'User')
 const isMobile = ref(window.innerWidth < 768)
 function handleResize() {
   isMobile.value = window.innerWidth < 768

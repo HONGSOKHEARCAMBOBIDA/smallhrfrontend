@@ -95,15 +95,15 @@ import { ref, computed, onMounted } from 'vue'
 import { Upload, Download, Refresh,Delete } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import { triggerBackup, listBackups, downloadBackup,deleteBackup } from '../api/services'
-import { useAuthStore } from '../stores/auth'
+import { useUserDataStore } from '../stores/user_data'
 const backups = ref([])
 const loading = ref(false)
 const triggering = ref(false)
 const alert = ref({ type: 'success', message: '' })
-const auth = useAuthStore()
-const canBackup = computed(() => auth.permission?.some(p => p.name === 'add.backup'))
-const canDownloadBackup = computed(() => auth.permission?.some(p => p.name === 'view.download.backup'))
-const canDeleteBackup = computed(() => auth.permission?.some(p => p.name === 'delete.backup'))
+const userdataStore = useUserDataStore()
+const canBackup = computed(() => userdataStore.permissions?.some(p => p.name === 'add.backup'))
+const canDownloadBackup = computed(() => userdataStore.permissions?.some(p => p.name === 'view.download.backup'))
+const canDeleteBackup = computed(() => userdataStore.permissions?.some(p => p.name === 'delete.backup'))
 const showAlert = (type, message) => {
   alert.value = { type, message }
   setTimeout(() => { alert.value.message = '' }, 4000)

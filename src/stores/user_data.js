@@ -8,12 +8,13 @@ export const useUserDataStore = defineStore('userdata', {
 
   getters: {
     name: (state) => state.userdata?.name || '',
+    permissions: (state) => state.userdata?.permissions || [],
   },
 
   actions: {
     async getuserdata() {
       const res = await getuserdata()
-      this.userdata = res.data.data
+      this.userdata = res.data.data || ""
     },
 
     clear() {
