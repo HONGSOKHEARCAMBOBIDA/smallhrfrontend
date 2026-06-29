@@ -260,6 +260,8 @@ import AppTable from "../../components/AppTable.vue";
 import AppButton from "../../components/AppButton.vue";
 import AppDialog from "../../components/AppDialog.vue";
 import AppTabs from "../../components/AppTabs.vue";
+import { useNotification } from "../../composables/useNotification.js";
+const notify = useNotification()
 const userDataStore = useUserDataStore()
 const companyStore = useCompanyStore()
 const companies = ref([]);
@@ -276,6 +278,7 @@ const editId = ref(null);
 const formRef = ref();
 const auth = useAuthStore();
 const activeTab = ref("general");
+
 const form = reactive({
   map_link: "",
   name: "",
@@ -294,6 +297,7 @@ const form = reactive({
 const canAddCompany = computed(() =>
   userDataStore.permissions?.some((p) => p.name === "add.company"),
 );
+
 const canEditCompany = computed(() =>
   userDataStore.permissions?.some((p) => p.name === "edit.company"),
 );
@@ -323,7 +327,7 @@ async function fetchCompanies() {
     companies.value = res.data.data || [];
     total.value = res.data.pagination?.totalCount || 0;
   } catch (e) {
-    ElMessage.error(e.response?.data?.error);
+    notify.error(e.response?.data?.error || "");
   } finally {
     loading.value = false;
   }
@@ -385,15 +389,15 @@ async function handleSave() {
             if (form.color) {
         companyStore.setColor(form.color);
       }
-      ElMessage.success("កែប្រែបានជោគជ័យ");
+      notify.success("កែប្រែបានជោគជ័យ");
     } else {
       await createCompany(form);
-      ElMessage.success("បង្កេីតក្រុមហ៑ុនបានជោគជ័យ");
+      notify.success("បង្កេីតក្រុមហ៑ុនបានជោគជ័យ");
     }
     dialogVisible.value = false;
     fetchCompanies();
   } catch (e) {
-    ElMessage.error(e.response?.data?.message || "Failed to save");
+    notify.error(e.response?.data?.error || "")
   } finally {
     saving.value = false;
   }
@@ -409,12 +413,12 @@ async function handleUpdateTelegram() {
         if (v !== "") payload[k] = v;
       });
       await updateTelegram(editId.value, payload);
-      ElMessage.success("កែប្រែបានជោគជ័យ");
+      notify.success("កែប្រែបានជោគជ័យ");
     }
     dialogTelegramVisible.value = false;
     fetchCompanies();
   } catch (e) {
-    ElMessage.error(e.response?.data?.error || "Failed to save");
+    notify.error(e.response?.data?.error || "")
   } finally {
     saving.value = false;
   }
@@ -422,6 +426,7 @@ async function handleUpdateTelegram() {
 
 onMounted(fetchCompanies);
 </script>
+
 
 <style scoped>
 .page-header {
