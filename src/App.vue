@@ -34,6 +34,10 @@ body {
 .el-pagination {
   font-family: 'Siemreap', sans-serif !important;
 }
+.el-loading-mask {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
 
 :root {
   --primary: #083767;

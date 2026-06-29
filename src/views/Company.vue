@@ -261,11 +261,13 @@ import AppButton from "../../components/AppButton.vue";
 import AppDialog from "../../components/AppDialog.vue";
 import AppTabs from "../../components/AppTabs.vue";
 import { useNotification } from "../../composables/useNotification.js";
+import { useLoading } from "../../composables/useLoading.js";
 const notify = useNotification()
 const userDataStore = useUserDataStore()
 const companyStore = useCompanyStore()
 const companies = ref([]);
 const loading = ref(false);
+const useloading = useLoading();
 const saving = ref(false);
 const page = ref(1);
 const pageSize = ref(10);
@@ -375,7 +377,9 @@ function openEditTelegram(row) {
 
 async function handleSave() {
   await formRef.value.validate();
-  saving.value = true;
+  useloading.show({
+    text: "កំពុងដំណេីរការ..."
+  })
   try {
     if (isEdit.value) {
       const payload = {};
@@ -399,13 +403,15 @@ async function handleSave() {
   } catch (e) {
     notify.error(e.response?.data?.error || "")
   } finally {
-    saving.value = false;
+    useloading.hide()
   }
 }
 
 async function handleUpdateTelegram() {
   await formRef.value.validate();
-  saving.value = true;
+  useloading.show({
+    text: "កំពុងដំណេីរការ..."
+  })
   try {
     if (isEditTelegram.value) {
       const payload = {};
@@ -420,7 +426,7 @@ async function handleUpdateTelegram() {
   } catch (e) {
     notify.error(e.response?.data?.error || "")
   } finally {
-    saving.value = false;
+    useloading.hide()
   }
 }
 
