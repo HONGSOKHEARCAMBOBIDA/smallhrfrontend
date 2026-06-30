@@ -1,24 +1,5 @@
 <template>
   <div class="dashboard">
-    <!-- Stats row: 4-col on desktop, 2-col on mobile -->
-    <!-- <div class="stat-grid">
-      <div
-        class="stat-card"
-        v-for="stat in stats"
-        :key="stat.label"
-        :style="{ borderTop: `4px solid ${stat.color}` }"
-      >
-        <div class="stat-icon" :style="{ background: stat.color + '1a', color: stat.color }">
-          <el-icon size="22"><component :is="stat.icon" /></el-icon>
-        </div>
-        <div class="stat-body">
-          <div class="stat-value">{{ stat.value }}</div>
-          <div class="stat-label">{{ stat.label }}</div>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- Two-col on desktop, stacked on mobile -->
     <div class="dash-grid">
       <el-card class="dash-card">
         <template #header><span class="card-title">សកម្មភាពរហ័ស</span></template>
@@ -140,25 +121,21 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAttendance, countuser } from '../api/services'
+import { getAttendance } from '../api/services'
 import { ElNotification } from 'element-plus'
-const loading = ref(false)
-const today = new Date().toISOString().split('T')[0]
 import AppTable from '../../components/AppTable.vue'
 import AppDialog from '../../components/AppDialog.vue'
 import { LocationInformation } from "@element-plus/icons-vue";
-const stats = ref([
-  { label: 'បុគ្គលិកសរុប',  value: '—', icon: 'User',    color: '#409eff' },
-  { label: 'វត្តមានថ្ងៃនេះ', value: '—', icon: 'Clock',   color: '#67c23a' },
-  { label: 'ប្រាក់ខែ',       value: '—', icon: 'Money',   color: '#e6a23c' },
-  { label: 'ក្រុមហ៑ុន',      value: '—', icon: 'OfficeBuilding', color: '#f56c6c' },
-])
+
+const loading = ref(false)
+const today = new Date().toISOString().split('T')[0]
 const recentAttendance = ref([])
 const recordsDialog = ref(false);
 const selectedRow = ref(null);
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+
 async function loadAttendance() {
   loading.value = true
 

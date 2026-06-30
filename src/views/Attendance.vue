@@ -1,33 +1,6 @@
-<template>
+<!-- <template>
   <div>
-    <!-- Check-in Action Card -->
-    <!-- <el-card class="checkin-card">
-      <template #header>
-        <div style="display:flex; align-items:center; gap:8px">
-          <el-icon color="#409eff"><Clock /></el-icon>
-          <span class="card-title">Record Attendance</span>
-        </div>
-      </template>
-      <el-form :model="attendForm" inline>
-        <el-form-item label="Latitude">
-          <el-input v-model="attendForm.latitude" placeholder="11.5564" style="width:150px" />
-        </el-form-item>
-        <el-form-item label="Longitude">
-          <el-input v-model="attendForm.longitude" placeholder="104.9282" style="width:150px" />
-        </el-form-item>
-        <el-form-item label="Reason">
-          <el-input v-model="attendForm.reason" placeholder="Optional reason" style="width:200px" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="Location" :loading="checking" @click="handleCheckIn">
-            Check In / Out
-          </el-button>
-          <el-button icon="Aim" @click="getLocation" title="Auto-detect location" />
-        </el-form-item>
-      </el-form>
-    </el-card> -->
 
-    <!-- Filters -->
     <AppFilterBar
       :fields="[
         { slot: 'name', span: 10 },
@@ -152,9 +125,93 @@
       </AppTable>
     </AppDialog>
   </div>
-</template>
+</template> -->
+<template>
+  <div>
+    <!-- Filters -->
+    <AppFilterBar
+      :fields="[
+        { slot: 'name', span: 10 },
+        { slot: 'date', span: 6 },
+      ]"
+      :action-span="2"
+    >
+      <template #name>
+        <el-input
+          v-model="filters.name"
+          placeholder="ស្វែងរក"
+          prefix-icon="Search"
+          clearable
+          @change="fetchAttendance"
+          size="large"
+        />
+      </template>
+      <template #date>
+        <el-date-picker
+          v-model="filters.check_date"
+          type="date"
+          placeholder="ជ្រេីសរេីសថ្ងៃទី"
+          value-format="YYYY-MM-DD"
+          clearable
+          @change="fetchAttendance"
+          style="width: 100%"
+          size="large"
+        />
+      </template>
+      <template #actions>
+        <AppButton type="primary" @click="fetchAttendance"> ស្វែងរក </AppButton>
+      </template>
+    </AppFilterBar>
 
-<script setup>
+    <el-card>
+      <AppTable
+        :data="attendance"
+        :loading="loading"
+        show-index
+        v-model:current-page="page"
+        v-model:page-size="pageSize"
+        :total="total"
+        @page-change="fetchAttendance"
+        :columns="[
+          { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
+          { prop: 'gender_string', label: 'ភេទ', minWidth: 80 },
+          { prop: 'role_name', label: 'តួនាទី', minWidth: 100 },
+          { prop: 'company_name', label: 'ក្រុមហ៑ុន', minWidth: 120 },
+          { prop: 'check_date', label: 'ថ្ងៃស្កែន', minWidth: 110 },
+          { label: 'ចូលព្រឹក', slot: 'check_in1', minWidth: 110 },
+          { label: 'ចេញថ្ងៃត្រង់', slot: 'check_out1', minWidth: 110 },
+          { label: 'ចូលថ្ងៃត្រង់', slot: 'check_in2', minWidth: 110 },
+          { label: 'ចេញល្ងាច', slot: 'check_out2', minWidth: 110 },
+          { prop: 'reason', label: 'មូលហេតុ', minWidth: 130 },
+          { label: 'ស្ថានភាព', slot: 'status', width: 100 },
+        ]"
+      >
+        <template #status="{ row }">
+          <el-tag
+            :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
+            size="small"
+          >
+            {{ row.status }}
+          </el-tag>
+        </template>
+
+        <template #check_in1="{ row }">
+          <CheckCell :time="row.check_in1" :diff="row.check_in1_diff" />
+        </template>
+        <template #check_out1="{ row }">
+          <CheckCell :time="row.check_out1" :diff="row.check_out1_diff" />
+        </template>
+        <template #check_in2="{ row }">
+          <CheckCell :time="row.check_in2" :diff="row.check_in2_diff" />
+        </template>
+        <template #check_out2="{ row }">
+          <CheckCell :time="row.check_out2" :diff="row.check_out2_diff" />
+        </template>
+      </AppTable>
+    </el-card>
+  </div>
+</template>
+<!-- <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { createAttendance, getAttendance } from "../api/services";
@@ -240,6 +297,63 @@ async function fetchAttendance() {
 function viewRecords(row) {
   selectedRow.value = row;
   recordsDialog.value = true;
+}
+
+onMounted(fetchAttendance);
+</script> -->
+
+<script setup>
+import { ref, reactive, onMounted, h } from "vue";
+import { ElMessage } from "element-plus";
+import { getAttendance,exportAttendancePDF } from "../api/services";
+import AppFilterBar from "../../components/AppFilterBar.vue";
+import AppButton from "../../components/AppButton.vue";
+import AppTable from "../../components/AppTable.vue";
+
+const attendance = ref([]);
+const loading = ref(false);
+const page = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const filters = reactive({
+  name: "",
+  check_date: new Date().toISOString().split("T")[0],
+  company_id: "",
+});
+
+// small functional component to render time + colored diff badge underneath
+const CheckCell = (props) => {
+  if (!props.time) {
+    return h("span", { style: "color:#c0c4cc" }, "—");
+  }
+  const isLate = props.diff?.includes("យឺត") || props.diff?.includes("បន្ថែម");
+  const isEarly = props.diff?.includes("មុនម៉ោង");
+  const color = isLate ? "#f56c6c" : isEarly ? "#e6a23c" : "#67c23a";
+
+  return h("div", [
+    h("div", { style: "font-weight:600" }, props.time),
+    props.diff
+      ? h("div", { style: `font-size:11px;color:${color}` }, props.diff)
+      : null,
+  ]);
+};
+CheckCell.props = ["time", "diff"];
+
+async function fetchAttendance() {
+  loading.value = true;
+  try {
+    const params = { page: page.value, page_size: pageSize.value };
+    if (filters.name) params.name = filters.name;
+    if (filters.check_date) params.check_date = filters.check_date;
+    if (filters.company_id) params.company_id = filters.company_id;
+    const res = await exportAttendancePDF(params);
+    attendance.value = res.data.data || [];
+    total.value = res.data.pagination?.totalCount || 0;
+  } catch {
+    ElMessage.error("Failed to load attendance");
+  } finally {
+    loading.value = false;
+  }
 }
 
 onMounted(fetchAttendance);

@@ -32,6 +32,9 @@ export const updateShift = (data) => api.put('/edit.shift', data)
 export const createAttendance = (data) => api.post('/add.attendance', data)
 export const getAttendance = (params) => api.get('/view.attendance', { params })
 export const getAttendanceDraft = (params) => api.get('/view.attendance.draft')
+export const exportAttendancePDF = (params) => api.get('/generate.attendance.pdf', {
+  params,
+})
 
 // Payroll
 export const getPayrollDraft = (params) => api.get('/view.payroll.draft', { params })
@@ -45,7 +48,7 @@ export const triggerBackup = () => api.post('add.backup')
 export const listBackups = () => api.get('view.backup')
 export const downloadBackup = (filename) => api.get('view.download.backup', { 
   params: { file: filename },
-  responseType: 'blob'  // important — it's a file download
+  responseType: 'blob' 
 })
 export const deleteBackup = (filename) => api.delete('delete.backup',{
   params: {file: filename},
