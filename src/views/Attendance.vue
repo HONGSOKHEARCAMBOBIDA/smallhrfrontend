@@ -333,7 +333,7 @@ const CheckCell = (props) => {
   return h("div", [
     h("div", { style: "font-weight:600" }, props.time),
     props.diff
-      ? h("div", { style: `font-size:11px;color:${color}` }, props.diff)
+      ? h("div", { style: `font-size:14px;color:${color}` }, props.diff)
       : null,
   ]);
 };
