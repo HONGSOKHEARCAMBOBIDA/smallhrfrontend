@@ -53,3 +53,11 @@ export const downloadBackup = (filename) => api.get('view.download.backup', {
 export const deleteBackup = (filename) => api.delete('delete.backup',{
   params: {file: filename},
 })
+
+// LeaveDeductType
+export const getleavedeductype = () => api.get('view.leave.deduct.type')
+
+// LeaveType
+export const getleavetype = () => api.get('view.leave.type')
+export const createleavetype = (data) => api.post('/add.leave.type',data)
+export const updateleavetype = (id, data) => api.put(`/edit.leave.type/${id}`, data)

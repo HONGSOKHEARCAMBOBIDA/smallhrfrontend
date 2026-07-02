@@ -47,6 +47,17 @@ const routes = [
         },
       },
       {
+        path: "leavetype",
+        name: "LeaveType",
+        component: () => import("../views/LeaveType.vue"),
+        meta: {
+          title: "ប្រភេទច្បាប់",
+          icon: "List",
+          short: "ប្រភេទច្បាប់",
+          showInNav: false,
+        }
+      },
+      {
         path: "attendance",
         name: "Attendance",
         component: () => import("../views/Attendance.vue"),
