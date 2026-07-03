@@ -145,6 +145,14 @@
               <el-form-item label="Color">
                 <el-color-picker-panel v-model="form.color" />
               </el-form-item>
+              <el-form-item label="ចំនួនថ្ងៃធ្វេីការ">
+                <el-input
+                  type="number"
+                  v-model.number="form.total_work_day"
+                  placeholder="30"
+                  size="large"
+                />
+              </el-form-item>
             </div>
           </template>
           <template #penalty>
@@ -293,7 +301,8 @@ const form = reactive({
   bot_token: "",
   group_link: "",
   can_scan_outsize: null,
-  color: ""
+  color: "",
+  total_work_day:null
 });
 
 const canAddCompany = computed(() =>
@@ -359,7 +368,8 @@ function openEdit(row) {
     late_penalty: row.late_penalty || "",
     left_early_penalty: row.left_early_penalty || "",
     can_scan_outsize: row.can_scan_outsize ?? null,
-    color: row.color || ""
+    color: row.color || "",
+    total_work_day: row.total_work_day || "",
   });
   dialogVisible.value = true;
 }

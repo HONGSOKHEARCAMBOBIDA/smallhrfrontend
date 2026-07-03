@@ -23,6 +23,7 @@ export const changePassword = (data) => api.put('/change.password', data)
 export const countuser = () => api.get('/count.user')
 export const getrole = () => api.get('/view.role')
 export const getuserdata = () => api.get(`/view.user.data`)
+export const getuserapprove = () => api.get(`/view.user.approve`)
 
 // Shift
 export const createShift = (data) => api.post('/add.shift', data)
@@ -61,3 +62,9 @@ export const getleavedeductype = () => api.get('view.leave.deduct.type')
 export const getleavetype = () => api.get('view.leave.type')
 export const createleavetype = (data) => api.post('/add.leave.type',data)
 export const updateleavetype = (id, data) => api.put(`/edit.leave.type/${id}`, data)
+
+// LeaveRequest
+export const getleaverequest = (params) => api.get('/view.leave.request',{params})
+export const addleaverequest = (data) => api.post('/add.leave.request',data)
+export const editleaverequest = (id,data) => api.put(`/edit.leave.request/${id}`,data)
+export const editstatusleaverequest = (id,data) => api.put(`/edit.status.leave.request/${id}`,data)

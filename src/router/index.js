@@ -58,6 +58,17 @@ const routes = [
         }
       },
       {
+        path: "leaverequest",
+        name: "LeaveRequest",
+        component: () => import("../views/LeaveRequest.vue"),
+        meta: {
+          title: "សុំច្បាប់",
+          icon: "Promotion",
+          short: "សុំច្បាប់",
+          showInNav: false,
+        }
+      },
+      {
         path: "attendance",
         name: "Attendance",
         component: () => import("../views/Attendance.vue"),

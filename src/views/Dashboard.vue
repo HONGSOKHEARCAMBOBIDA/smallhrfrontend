@@ -24,7 +24,7 @@
             <el-icon size="26" color="#8E44AD"><List /></el-icon>
             <span>ប្រភេទច្បាប់ក្នុងក្រុមហ៑ុន</span>
           </div>
-          <div class="action-btn" @click="$router.push('/company')">
+          <div class="action-btn" @click="$router.push('/leaverequest')">
             <el-icon size="26" color="#67C23A"><Promotion /></el-icon>
             <span>សុំច្បាប់</span>
           </div>
