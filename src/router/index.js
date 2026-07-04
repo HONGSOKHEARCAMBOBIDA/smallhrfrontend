@@ -69,6 +69,18 @@ const routes = [
         }
       },
       {
+        path: 'role',
+        name: 'Role',
+        component: () => import("../views/Role.vue"),
+        meta:{
+          title: "សិទ្ធ",
+          icon: "User",
+          short: "សិទ្ធ",
+          showInNav: true,
+          permission: "add.role.has.permission",
+        }
+      },
+      {
         path: "attendance",
         name: "Attendance",
         component: () => import("../views/Attendance.vue"),

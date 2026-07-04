@@ -68,3 +68,9 @@ export const getleaverequest = (params) => api.get('/view.leave.request',{params
 export const addleaverequest = (data) => api.post('/add.leave.request',data)
 export const editleaverequest = (id,data) => api.put(`/edit.leave.request/${id}`,data)
 export const editstatusleaverequest = (id,data) => api.put(`/edit.status.leave.request/${id}`,data)
+
+// RoleHasPermission
+export const getrolehaspermission = (id) => api.get(`/view.role.has.permission/${id}`)
+export const addrolehaspermission = (data) => api.post('/add.role.has.permission',data)
+export const deleterolehaspermission = (data) => api.delete('/delete.role.has.permission',{data})
+export const editrole = (id,data) => api.put(`/edit.role/${id}`,data)
