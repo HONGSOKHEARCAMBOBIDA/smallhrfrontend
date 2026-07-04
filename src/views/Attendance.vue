@@ -133,8 +133,9 @@
       :fields="[
         { slot: 'name', span: 10 },
         { slot: 'date', span: 6 },
+        {slot: 'company',span:5}
       ]"
-      :action-span="2"
+      :action-span="3"
     >
       <template #name>
         <el-input
@@ -157,6 +158,12 @@
           style="width: 100%"
           size="large"
         />
+      </template>
+      <template #company>
+        <el-select v-model="filters.company_id" placeholder="ក្រុមហ៑ុន" clearable style="width: 100%" size="large"
+          @change="fetchAttendance">
+          <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
+        </el-select>
       </template>
       <template #actions>
         <AppButton type="primary" @click="fetchAttendance"> ស្វែងរក </AppButton>
@@ -305,7 +312,7 @@ onMounted(fetchAttendance);
 <script setup>
 import { ref, reactive, onMounted, h } from "vue";
 import { ElMessage } from "element-plus";
-import { getAttendance,exportAttendancePDF } from "../api/services";
+import { getAttendance,exportAttendancePDF, getCompany } from "../api/services";
 import AppFilterBar from "../../components/AppFilterBar.vue";
 import AppButton from "../../components/AppButton.vue";
 import AppTable from "../../components/AppTable.vue";
@@ -315,6 +322,7 @@ const loading = ref(false);
 const page = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
+const companys = ref([]);
 const filters = reactive({
   name: "",
   check_date: new Date().toISOString().split("T")[0],
@@ -339,6 +347,18 @@ const CheckCell = (props) => {
 };
 CheckCell.props = ["time", "diff"];
 
+async function fetchCompany() {
+  loading.value = true;
+  try {
+    const res = await getCompany();
+    companys.value = res.data.data || [];
+  } catch {
+    ElMessage.error("Failed to load employees");
+  } finally {
+    loading.value = false;
+  }
+}
+
 async function fetchAttendance() {
   loading.value = true;
   try {
@@ -356,7 +376,10 @@ async function fetchAttendance() {
   }
 }
 
-onMounted(fetchAttendance);
+onMounted(()=>{
+  fetchAttendance();
+  fetchCompany()
+});
 </script>
 
 <style scoped>

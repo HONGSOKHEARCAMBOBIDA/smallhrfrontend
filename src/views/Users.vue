@@ -75,7 +75,7 @@
           </AppButton>
           <AppButton size="small" icon="View" type="primary" circle @click="openShifts(row)">
           </AppButton>
-          <AppButton size="small" icon="Delete" type="danger" circle @click="DeleteUser(row)">
+          <AppButton  v-show="false" size="small" icon="Delete" type="danger" circle @click="DeleteUser(row)">
           </AppButton>
         </template>
       </AppTable>

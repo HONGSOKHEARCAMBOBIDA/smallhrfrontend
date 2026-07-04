@@ -73,13 +73,13 @@
       v-model:page-size="pageSize"
       @page-change="fetchPayroll"
       :columns="[
-        {prop: 'user_name',label: 'ឈ្មោះបុគ្គលិក',minWidth:100},
+        {prop: 'user_name',label: 'ឈ្មោះ',minWidth:100},
         {label: 'ភេទ',slot: 'gender',width: 80},
         {prop: 'role_name',label: 'តួនាទី',width: 110},
         {prop: 'company_name',label: 'ក្រុមហ៊ុន',width:160},
         {label:'ប្រភេទប្រាក់ខែ',slot: 'payroll_type',width:130},
         {label: 'ប្រាក់ខែគោល',slot: 'salary',width: 130},
-        {label: 'ប្រាក់ខែពាក់កណ្ដាល',slot: 'half_salary',width: 135},
+        {label: 'ពាក់កណ្ដាល',slot: 'half_salary',width: 135},
         {prop: 'total_work_day',label: 'ចំនួនថ្ងៃធ្វើការ',width: 120},
         {label: 'កាត់លុយ',slot: 'total_deduction',width: 130},
         {label: 'ប្រាក់ខែទទួលបាន',slot: 'net_salary',width: 160},

@@ -173,8 +173,8 @@ watch(activeTab, (tab) => {
 }
 
 .login-card {
-  border: 1px solid #215deb;
-  border-radius: 6px;
+  border: 1px solid #8aaff5;
+  border-radius: 2px;
   padding: 48px 40px;
   width: 420px;
 }

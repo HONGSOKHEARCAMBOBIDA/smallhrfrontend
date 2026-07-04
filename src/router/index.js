@@ -115,7 +115,7 @@ const routes = [
         meta: {
           title: "ប្រវត្តរូប",
           icon: "Setting",
-          short: "ប្រវត្តរូប",
+          short: "ប្រវត្ត",
           showInNav: true,
         },
       },
@@ -161,7 +161,7 @@ router.beforeEach((to) => {
       (p) => p.name === to.meta.permission,
     );
     if (!hasPermission) {
-      return { name: "NotFound" };
+      return { name: "Dashboard" };
     }
   }
   if (to.meta.title) {

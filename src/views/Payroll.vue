@@ -57,9 +57,10 @@
           { label: 'ប្រាក់ខែគោល', slot: 'basic_salary', min: 120 },
           { label: 'ប្រាក់ខែពាក់កណ្ដាល', slot: 'half_salary', min: 155 },
           { label: 'ចំនួនថ្ងៃធ្វើការ', prop: 'total_work_day', min: 100 },
-          { label: 'ចំនួនយឺត', prop: 'total_late', min: 105 },
-          { label: 'ចេញមុនម៉ោង', prop: 'total_left_early', min: 110 },
-          { label: 'កាត់លុយ', slot: 'total_deduction', min: 80 },
+          { label: 'ចំនួនយឺត', slot: 'total_late', min: 105 },
+          { label: 'ចេញមុនម៉ោង', slot: 'total_left_early', min: 110 },
+          {slot:'leave_deduction',label:'កាត់លុយច្បាប់',min:110},
+          { label: 'កាត់លុយសរុប', slot: 'total_deduction', min: 80 },
           { label: 'ប្រាក់ខែទទួលបាន', slot: 'net_salary', min: 180 },
         ]"
         @selection-change="(rows) => (selectedRows = rows)"
@@ -69,6 +70,21 @@
         </template>
         <template #half_salary="{ row }">
           {{ row.half_salary }} {{ row.currency }}
+        </template>
+        <template #total_late="{row}">
+          {{ row.total_late }}
+          <el-tag type="danger">
+           កាត់លុយ {{ row.total_penalty_late }} {{ row.currency }}
+          </el-tag> 
+        </template>
+        <template #leave_deduction="{row}">
+          <el-text tag="mark">{{ row.leave_deduction }} {{ row.currency }}</el-text>
+        </template>
+        <template #total_left_early="{row}">
+          {{ row.total_left_early }}
+                    <el-tag type="danger">
+           កាត់លុយ {{ row.total_left_early_penalty }} {{ row.currency }}
+          </el-tag> 
         </template>
         <template #total_deduction="{ row }">
           <el-input v-model="row.total_deduction" :row="1">
@@ -178,6 +194,7 @@ async function fetchDraft() {
       company_id : selectcompany.value
     });
     draft.value = res.data.data || [];
+    console.log(res)
   } catch (e) {
     ElMessage.error(
       e.response?.data?.message || "Failed to load payroll draft",
@@ -210,6 +227,7 @@ async function submitPayroll() {
       status: 0,
       note: payForm.note,
       attendance_id: row.unpaid_attendance || [],
+      leave_id: row.leave_id || []
     }));
     await createPayroll({ payrolls });
     ElMessage.success("ប្រាក់ខែបេីកបានជោគជ័យ");

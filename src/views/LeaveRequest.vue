@@ -390,24 +390,24 @@ onUnmounted(() => clearTimeout(searchTimer));
     <AppDialog
       v-model="dialogVisible"
       :title="isEditMode ? 'កែប្រែការសុំច្បាប់' : 'បង្កើតការសុំច្បាប់'"
-      width="640px"
+      width="740px"
     >
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <div class="form-row">
           <el-form-item label="ប្រភេទច្បាប់" prop="leave_type_id">
-            <el-select
-              v-model="form.leave_type_id"
-              placeholder="ជ្រើសរើសប្រភេទច្បាប់"
-              style="width: 100%"
-              size="large"
-            >
-              <el-option
-                v-for="lt in leavetype"
-                :key="lt.id"
-               :label="lt.name + (lt.is_deduct ? ' - កាត់លុយ' : ' - មិនកាត់លុយ')"
-                :value="lt.id"
-              />
-            </el-select>
+           <el-select
+  v-model="form.leave_type_id"
+  placeholder="ជ្រើសរើសប្រភេទច្បាប់"
+  style="width: 100%"
+  size="large"
+>
+  <el-option
+    v-for="lt in leavetype"
+    :key="lt.id"
+    :label="`${lt.name} (${lt.company_name}) ${lt.is_deduct ? '- កាត់លុយ' : '- មិនកាត់លុយ'}`"
+    :value="lt.id"
+  />
+</el-select>
           </el-form-item>
           <el-form-item label="ប្រភេទឯកតា" prop="deduct_type_id">
             <el-select
