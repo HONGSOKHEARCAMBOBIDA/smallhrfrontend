@@ -199,7 +199,7 @@ onMounted(() => {
     <AppDialog
       v-model="dialogVisible"
       title="គ្រប់គ្រងសិទ្ធិ"
-      width="600px"
+      width="700px"
     >
       <p class="dialog-subtitle">
         បិទ/បើក ដើម្បីផ្តល់ ឬដកសិទ្ធិចេញពីតួនាទីនេះ

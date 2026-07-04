@@ -166,8 +166,8 @@ watch(
 }
 
 :deep(.el-table__header-wrapper th) {
-  background-color: var(--brand-color,#4589ce);
-  color: #ffffff !important;
+  /* background-color: var(--brand-color,#4589ce); */
+  color: #030303 !important;
 }
 
 .app-table-card {
