@@ -6,7 +6,7 @@
         <div class="action-grid">
           <div class="action-btn" @click="$router.push('/users')">
             <el-icon size="26" color="#409eff"><UserFilled /></el-icon>
-            <span>បន្ថែមបុគ្គលិក</span>
+            <span>បុគ្គលិក</span>
           </div>
           <div class="action-btn" @click="$router.push('/attendance')">
             <el-icon size="26" color="#67c23a"><Clock /></el-icon>
