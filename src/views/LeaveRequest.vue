@@ -13,7 +13,8 @@ import {
   addleaverequest,
   editleaverequest,
   editstatusleaverequest,
-  getCompany
+  getCompany,
+  deleteleaverequest
 } from "../api/services.js";
 import { useUserDataStore } from "../stores/user_data.js";
 import AppFilterBar from "../../components/AppFilterBar.vue";
@@ -216,6 +217,18 @@ async function updateStatus(row, status) {
   }
 }
 
+async function deleteleave(row){
+  try {
+    await deleteleaverequest(row.id);
+    notify.success("លុបច្បាប់បានជោគជ័យ");
+    await fetchLeaveRequest();
+  }catch(e){
+    notify.error(
+      e.response?.data?.error || "មិនអាចធ្វើបច្ចុប្បន្នភាពស្ថានភាពបានទេ",
+    );
+  }
+}
+
 function statusTagType(status) {
   if (status === 2) return "success";
   if (status === 3) return "danger";
@@ -293,8 +306,9 @@ onUnmounted(() => clearTimeout(searchTimer));
       <AppTable
         :data="leaverequest"
         :loading="loading"
+        :actions-width="240"
         v-model:current-page="pagination.page"
-         v-model:page-size="pagination.page_size"
+        v-model:page-size="pagination.page_size"
          :total="pagination.total"
          @page-change="fetchLeaveRequest"
         :columns="[
@@ -379,6 +393,14 @@ onUnmounted(() => clearTimeout(searchTimer));
               type="warning"
               circle
               @click="updateStatus(row, 1)"
+            />
+            <AppButton
+              v-if="row.status === 1"
+              size="small"
+              icon="Delete"
+              type="danger"
+              circle
+              @click="deleteleave(row)"
             />
           </template>
         </template>
