@@ -2,13 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/index.html",
-      "headers": [
-        {
-          "key": "Set-Cookie",
-          "value": "refresh_token=your_value; Path=/; Secure; SameSite=None"
-        }
-      ]
+      "destination": "/index.html"
     }
   ]
 }
