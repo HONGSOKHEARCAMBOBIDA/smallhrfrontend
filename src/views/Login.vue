@@ -136,7 +136,7 @@ async function handleLogin() {
   try {
     const res = await login(form);
     auth.setAuth(res.data.data);
-    router.push("/dashboard");
+    router.push("/CreateAttendance");
   } catch (e) {
     ElMessage.error(e.response?.data?.message || "Login failed");
   } finally {
