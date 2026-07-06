@@ -33,6 +33,16 @@
 
       <el-card class="dash-card">
         <template #header><span class="card-title">វត្តមានក្នុងថ្ងៃនេះ</span></template>
+        <el-date-picker
+          v-model="filters.check_date"
+          type="date"
+          placeholder="ជ្រេីសរេីសថ្ងៃទី"
+          value-format="YYYY-MM-DD"
+          clearable
+          @change="loadAttendance"
+          style="width: 100%"
+          size="large"
+        />
             <el-card>
       <AppTable
         :data="recentAttendance"
@@ -128,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { getAttendance } from '../api/services'
 import { ElNotification } from 'element-plus'
 import AppTable from '../../components/AppTable.vue'
@@ -136,19 +146,21 @@ import AppDialog from '../../components/AppDialog.vue'
 import { LocationInformation } from "@element-plus/icons-vue";
 
 const loading = ref(false)
-const today = new Date().toISOString().split('T')[0]
 const recentAttendance = ref([])
 const recordsDialog = ref(false);
 const selectedRow = ref(null);
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+const filters = reactive({
+  check_date: new Date().toISOString().split("T")[0],
+})
 
 async function loadAttendance() {
   loading.value = true
 
   try {
-    const params = {page: page.value,page_size: pageSize.value,check_date: today};
+    const params = {page: page.value,page_size: pageSize.value,check_date: filters.check_date};
     const res = await getAttendance(params)
     recentAttendance.value = res.data.data || [];
     total.value = res.data.pagination?.totalCount || 0;
@@ -161,6 +173,7 @@ async function loadAttendance() {
     loading.value = false
   }
 }
+
 function openLocation(row) {
   if (!row.latitdude || !row.longitude) {
     return ElMessage.warning("មិនមានទីតាំងស្កែន");
