@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, computed,watch,onUnmounted   } from "vue";
+import { ref, reactive, onMounted, computed, watch, onUnmounted } from "vue";
 import { useNotification } from "../../composables/useNotification.js";
 import AppTable from "../../components/AppTable.vue";
 import AppButton from "../../components/AppButton.vue";
@@ -14,7 +14,7 @@ import {
   editleaverequest,
   editstatusleaverequest,
   getCompany,
-  deleteleaverequest
+  deleteleaverequest,
 } from "../api/services.js";
 import { useUserDataStore } from "../stores/user_data.js";
 import AppFilterBar from "../../components/AppFilterBar.vue";
@@ -104,7 +104,6 @@ async function fetchCompany() {
   }
 }
 
-
 async function fetchLeaveType() {
   try {
     const res = await getleavetype();
@@ -141,7 +140,7 @@ async function fetchLeaveRequest() {
       ...filter,
     });
     leaverequest.value = res.data.data || [];
-    pagination.total =res.data.pagination?.totalCount || 0;
+    pagination.total = res.data.pagination?.totalCount || 0;
   } catch {
     notify.error("Failed to load leave requests");
   } finally {
@@ -217,12 +216,12 @@ async function updateStatus(row, status) {
   }
 }
 
-async function deleteleave(row){
+async function deleteleave(row) {
   try {
     await deleteleaverequest(row.id);
     notify.success("លុបច្បាប់បានជោគជ័យ");
     await fetchLeaveRequest();
-  }catch(e){
+  } catch (e) {
     notify.error(
       e.response?.data?.error || "មិនអាចធ្វើបច្ចុប្បន្នភាពស្ថានភាពបានទេ",
     );
@@ -244,7 +243,7 @@ watch(
       fetchLeaveRequest();
     }, 300); // debounce so typing doesn't fire a request per keystroke
   },
-  { deep: true }
+  { deep: true },
 );
 onMounted(() => {
   fetchCompany();
@@ -258,24 +257,31 @@ onUnmounted(() => clearTimeout(searchTimer));
 
 <template>
   <div>
-    <AppFilterBar :fields="[
-      {slot:'name',span:7},
-      {slot:'status',span:6},
-      {slot:'company',span:6},
-      {slot:'add',span:4}
-    ]" :action-span="4">
-    <template #name>
-      <AppInput v-model="filter.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable >
+    <AppFilterBar
+      :fields="[
+        { slot: 'name', span: 7 },
+        { slot: 'status', span: 6 },
+        { slot: 'company', span: 6 },
+        { slot: 'add', span: 4 },
+      ]"
+      :action-span="4"
+    >
+      <template #name>
+        <AppInput
+          v-model="filter.name"
+          placeholder="ស្វែងរក"
+          prefix-icon="Search"
+          clearable
+        >
+        </AppInput>
+      </template>
 
-      </AppInput>
-    </template>
-
-    <template #status>
+      <template #status>
         <el-select
           v-model="filter.status"
           placeholder="ស្ថានភាព"
           clearable
-          style="width:100%"
+          style="width: 100%"
           size="large"
         >
           <el-option
@@ -285,22 +291,31 @@ onUnmounted(() => clearTimeout(searchTimer));
             :value="s.value"
           />
         </el-select>
-    </template>
+      </template>
       <template #company>
-        <el-select v-model="filter.company_id" placeholder="ក្រុមហ៑ុន" clearable style="width: 100%" size="large"
-          @change="fetchUsers">
-          <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
+        <el-select
+          v-model="filter.company_id"
+          placeholder="ក្រុមហ៑ុន"
+          clearable
+          style="width: 100%"
+          size="large"
+          @change="fetchUsers"
+        >
+          <el-option
+            v-for="company in companys"
+            :key="company.id"
+            :label="company.name"
+            :value="company.id"
+          />
         </el-select>
       </template>
 
-          <template #add>
-        <AppButton  type="primary" @click="openCreateDialog">
+      <template #add>
+        <AppButton type="primary" @click="openCreateDialog">
           បន្ថែមច្បាប់
         </AppButton>
       </template>
-
     </AppFilterBar>
-
 
     <el-card class="table-card">
       <AppTable
@@ -309,8 +324,8 @@ onUnmounted(() => clearTimeout(searchTimer));
         :actions-width="240"
         v-model:current-page="pagination.page"
         v-model:page-size="pagination.page_size"
-         :total="pagination.total"
-         @page-change="fetchLeaveRequest"
+        :total="pagination.total"
+        @page-change="fetchLeaveRequest"
         :columns="[
           { label: 'ឈ្មោះបុគ្គលិក', slot: 'user_name', minWidth: 140 },
           { prop: 'role_name', label: 'តួនាទី', minWidth: 100 },
@@ -364,49 +379,57 @@ onUnmounted(() => clearTimeout(searchTimer));
         </template>
 
         <template #actions="{ row }">
-          <AppButton
-            v-if="canEditLeave && row.status === 1"
-            size="small"
-            icon="Edit"
-            type="warning"
-            circle
-            @click="openEditDialog(row)"
-          />
-          <template v-if="canEditStatusLeave">
+          <el-tooltip content="កែប្រែច្បាប់"c placement="top">
             <AppButton
+              v-if="canEditLeave && row.status === 1"
               size="small"
-              icon="Check"
-              type="success"
-              circle
-              @click="updateStatus(row, 2)"
-            />
-            <AppButton
-              size="small"
-              icon="Close"
-              type="danger"
-              circle
-              @click="updateStatus(row, 3)"
-            />
-            <AppButton
-              size="small"
-              icon="Refresh"
+              icon="Edit"
               type="warning"
               circle
-              @click="updateStatus(row, 1)"
+              @click="openEditDialog(row)"
             />
-            <AppButton
-              v-if="row.status === 1"
-              size="small"
-              icon="Delete"
-              type="danger"
-              circle
-              @click="deleteleave(row)"
-            />
+          </el-tooltip>
+          <template v-if="canEditStatusLeave">
+            <el-tooltip content="អនុញ្ញាត" placement="top">
+              <AppButton
+                size="small"
+                icon="Check"
+                type="success"
+                circle
+                @click="updateStatus(row, 2)"
+              />
+            </el-tooltip>
+            <el-tooltip content="បដិសេធ" placement="top">
+              <AppButton
+                size="small"
+                icon="Close"
+                type="danger"
+                circle
+                @click="updateStatus(row, 3)"
+              />
+            </el-tooltip>
+            <el-tooltip content="ត្រឡប់" placement="top">
+              <AppButton
+                size="small"
+                icon="Refresh"
+                type="warning"
+                circle
+                @click="updateStatus(row, 1)"
+              />
+            </el-tooltip>
+            <el-tooltip content="លុប" placement="top">
+              <AppButton
+                v-if="row.status === 1"
+                size="small"
+                icon="Delete"
+                type="danger"
+                circle
+                @click="deleteleave(row)"
+              />
+            </el-tooltip>
           </template>
         </template>
       </AppTable>
-
-      
     </el-card>
 
     <AppDialog
@@ -417,19 +440,19 @@ onUnmounted(() => clearTimeout(searchTimer));
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <div class="form-row">
           <el-form-item label="ប្រភេទច្បាប់" prop="leave_type_id">
-           <el-select
-  v-model="form.leave_type_id"
-  placeholder="ជ្រើសរើសប្រភេទច្បាប់"
-  style="width: 100%"
-  size="large"
->
-  <el-option
-    v-for="lt in leavetype"
-    :key="lt.id"
-    :label="`${lt.name} (${lt.company_name}) ${lt.is_deduct ? '- កាត់លុយ' : '- មិនកាត់លុយ'}`"
-    :value="lt.id"
-  />
-</el-select>
+            <el-select
+              v-model="form.leave_type_id"
+              placeholder="ជ្រើសរើសប្រភេទច្បាប់"
+              style="width: 100%"
+              size="large"
+            >
+              <el-option
+                v-for="lt in leavetype"
+                :key="lt.id"
+                :label="`${lt.name} (${lt.company_name}) ${lt.is_deduct ? '- កាត់លុយ' : '- មិនកាត់លុយ'}`"
+                :value="lt.id"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="ប្រភេទឯកតា" prop="deduct_type_id">
             <el-select
@@ -506,9 +529,15 @@ onUnmounted(() => clearTimeout(searchTimer));
           </el-select>
         </el-form-item>
 
-          <AppInput prop="reason" label="មូលហេតុ" clearable="true" v-model="form.reason" type="textarrea" :block="true">
-
-          </AppInput>
+        <AppInput
+          prop="reason"
+          label="មូលហេតុ"
+          clearable="true"
+          v-model="form.reason"
+          type="textarrea"
+          :block="true"
+        >
+        </AppInput>
       </el-form>
 
       <template #footer>
