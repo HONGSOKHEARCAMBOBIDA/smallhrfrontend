@@ -32,17 +32,21 @@
       </el-card>
 
       <el-card class="dash-card">
-        <template #header><span class="card-title">វត្តមានក្នុងថ្ងៃនេះ</span></template>
-        <el-date-picker
-          v-model="filters.check_date"
-          type="date"
-          placeholder="ជ្រេីសរេីសថ្ងៃទី"
-          value-format="YYYY-MM-DD"
-          clearable
-          @change="loadAttendance"
-          style="width: 100%"
-          size="large"
-        />
+  <template #header>
+    <div class="card-header-row">
+      <span class="card-title">វត្តមានក្នុងថ្ងៃនេះ</span>
+      <el-date-picker
+        v-model="filters.check_date"
+        type="date"
+        placeholder="ជ្រេីសរេីសថ្ងៃទី"
+        value-format="YYYY-MM-DD"
+        clearable
+        @change="loadAttendance"
+        style="width: 100%"
+        size="default"
+      />
+    </div>
+  </template>
             <el-card>
       <AppTable
         :data="recentAttendance"
@@ -196,6 +200,13 @@ loadAttendance()
 
 <style scoped>
 /* ── Stats grid: 4-col → 2-col ───────────────── */
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -287,6 +298,13 @@ loadAttendance()
 
 /* ── Mobile overrides ────────────────────────── */
 @media (max-width: 767px) {
+  .card-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .card-header-row .el-date-picker {
+    width: 100% !important;
+  }
   .stat-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;

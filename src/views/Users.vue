@@ -4,7 +4,7 @@
       { slot: 'name', span: 8 },
       { slot: 'role', span: 6 },
       { slot: 'company', span: 5 },
-      {slot: 'adduser',span: 5}
+      { slot: 'adduser', span: 5 }
     ]" :action-span="3">
       <template #name>
         <!-- <el-input v-model="filters.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable @input="fetchUsers" /> -->
@@ -14,7 +14,8 @@
       </template>
 
       <template #role>
-        <el-select v-model="filters.role_id" placeholder="តួនាទី" clearable style="width: 100%" @change="fetchUsers" size="large">
+        <el-select v-model="filters.role_id" placeholder="តួនាទី" clearable style="width: 100%" @change="fetchUsers"
+          size="large">
           <el-option v-for="role in roles" :key="role.id" :label="role.display_name" :value="role.id" />
         </el-select>
       </template>
@@ -39,44 +40,63 @@
           { prop: 'phone_hash', label: 'លេខទូរសព្ទ', minWidth: 130 },
           { prop: 'role_name', label: 'តួនាទី', minWidth: 110 },
           { prop: 'company_name', label: 'ក្រុមហ៑ុន', minWidth: 130 },
-          { label: 'QR Token', slot: 'qrtoken', width: 150 },
-          { prop: 'base_salary', label: 'ប្រាក់ខែ', width: 120 },
+          { label: 'QR', slot: 'qrtoken', width: 150 },
+          { slot: 'base_salary', label: 'ប្រាក់ខែ', width: 120 },
           { label: 'ស្ថានភាព', slot: 'status', width: 100 },
         ]" actionsWidth="200">
-<template #name="{ row }">
-  <span class="name-cell">
-    {{ row.name }}
-    <el-tooltip v-if="row.is_verify" content="Verified" placement="top">
-      <el-icon class="verified-badge" :size="20">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L9.5 4.5 6 4l-1 3.5L1.5 9 3 12l-1.5 3L6 16.5l-1 3.5 3.5.5L12 22l2.5-2.5 3.5-.5-1-3.5L20.5 15 19 12l1.5-3-3.5-1.5L16 4l-3.5.5L12 2z"/>
-          <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </el-icon>
-    </el-tooltip>
-  </span>
-</template>
+        <template #name="{ row }">
+          <span class="name-cell">
+            {{ row.name }}
+            <el-tooltip v-if="row.is_verify" content="Verified" placement="top">
+              <el-icon class="verified-badge" :size="20">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2L9.5 4.5 6 4l-1 3.5L1.5 9 3 12l-1.5 3L6 16.5l-1 3.5 3.5.5L12 22l2.5-2.5 3.5-.5-1-3.5L20.5 15 19 12l1.5-3-3.5-1.5L16 4l-3.5.5L12 2z" />
+                  <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+              </el-icon>
+            </el-tooltip>
+          </span>
+        </template>
+        <template #base_salary="{ row }">
+          <el-text tag="b">{{ row.base_salary }} {{ row.currency }}</el-text>
+        </template>
 
         <template #qrtoken="{ row }">
           <el-button type="primary" link @click="openQR(row.qr_token)">
-            View QR
+            <el-text tag="ins">View QR</el-text>
           </el-button>
         </template>
         <template #status="{ row }">
-          <el-tag :type="row.is_active ? 'success' : 'danger'" size="small">
-            {{ row.is_active ? "សកម្ម" : "អសកម្ម" }}
-          </el-tag>
+         <el-text
+  :style="{ color: row.is_active ? 'black' : 'red' }"
+>
+  {{ row.is_active ? "កំពុងធ្វើការ" : "ឈប់ធ្វើការ" }}
+</el-text>
+ 
         </template>
         <template #actions="{ row }" v-if="canedit">
-          <AppButton size="small" icon="Edit" type="warning" circle @click="openEdit(row)">
+<el-tooltip content="កែប្រែ" placement="top">
+            <AppButton size="small" icon="Edit" type="warning" circle @click="openEdit(row)">
           </AppButton>
-          <AppButton size="small" :icon="row.is_active ? 'CircleClose' : 'CircleCheck'"
+</el-tooltip>
+<el-tooltip content="បិទ" placement="top">
+            <AppButton size="small" :icon="row.is_active ? 'CircleClose' : 'CircleCheck'"
             :type="row.is_active ? 'danger' : 'success'" circle @click="toggleStatus(row)">
           </AppButton>
-          <AppButton size="small" icon="View" type="primary" circle @click="openShifts(row)">
+</el-tooltip>
+<el-tooltip content="ម៉ោងធ្វេីការ" placement="top">
+            <AppButton size="small" icon="View" type="primary" circle @click="openShifts(row)">
           </AppButton>
-          <AppButton  v-show="false" size="small" icon="Delete" type="danger" circle @click="DeleteUser(row)">
+</el-tooltip>
+          <AppButton v-show="false" size="small" icon="Delete" type="danger" circle @click="DeleteUser(row)">
           </AppButton>
+<el-tooltip content="Verify" placement="top">
+            <AppButton size="small" icon="CircleCheck" type="info" circle @click="VerifyUser(row)">
+
+          </AppButton>
+</el-tooltip>
         </template>
       </AppTable>
     </el-card>
@@ -126,45 +146,23 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-                    <el-col :xs="24" :sm="12">
-        <el-form-item label="សិទ្ធ">
-          <el-select
-            v-model="createForm.manage_company"
-            placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៊ុន"
-            clearable
-            size="large"
-            style="width: 100%"
-          >
-            <el-option
-
-              v-for="managecp in managecompany"
-              :key="managecp.id"
-              :label="managecp.name"
-              :value="managecp.id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-col>
-          <el-col :xs="24" :sm="12">
-        <el-form-item label="សាខាដែលអាចមើលទិន្នន័យ">
-          <el-select
-            :disabled="createForm.manage_company != 2"
-            v-model="createForm.company_ids"
-            placeholder="ជ្រើសរើស"
-            multiple
-            clearable
-            size="large"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="cp in companys"
-              :key="cp.id"
-              :label="cp.name"
-              :value="cp.id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-col>
+              <el-col :xs="24" :sm="12">
+                <el-form-item label="សិទ្ធ">
+                  <el-select v-model="createForm.manage_company" placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៊ុន" clearable
+                    size="large" style="width: 100%">
+                    <el-option v-for="managecp in managecompany" :key="managecp.id" :label="managecp.name"
+                      :value="managecp.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="12">
+                <el-form-item label="សាខាដែលអាចមើលទិន្នន័យ">
+                  <el-select :disabled="createForm.manage_company != 2" v-model="createForm.company_ids"
+                    placeholder="ជ្រើសរើស" multiple clearable size="large" style="width: 100%">
+                    <el-option v-for="cp in companys" :key="cp.id" :label="cp.name" :value="cp.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
 
             </el-row>
           </template>
@@ -276,44 +274,22 @@
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12">
-        <el-form-item label="សិទ្ធ">
-          <el-select
-            v-model="editForm.manage_company"
-            placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៊ុន"
-            clearable
-            size="large"
-            style="width: 100%"
-          >
-            <el-option
-
-              v-for="managecp in managecompany"
-              :key="managecp.id"
-              :label="managecp.name"
-              :value="managecp.id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-col>
+            <el-form-item label="សិទ្ធ">
+              <el-select v-model="editForm.manage_company" placeholder="ជ្រើសការគ្រប់គ្រងក្រុមហ៊ុន" clearable
+                size="large" style="width: 100%">
+                <el-option v-for="managecp in managecompany" :key="managecp.id" :label="managecp.name"
+                  :value="managecp.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
           <el-col :xs="24" :sm="12">
-        <el-form-item label="សាខាដែលអាចមើលទិន្នន័យ">
-          <el-select
-            :disabled="editForm.manage_company != 2"
-            v-model="editForm.company_ids"
-            placeholder="ជ្រើសរើស"
-            multiple
-            clearable
-            size="large"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="cp in companys"
-              :key="cp.id"
-              :label="cp.name"
-              :value="cp.id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-col>
+            <el-form-item label="សាខាដែលអាចមើលទិន្នន័យ">
+              <el-select :disabled="editForm.manage_company != 2" v-model="editForm.company_ids" placeholder="ជ្រើសរើស"
+                multiple clearable size="large" style="width: 100%">
+                <el-option v-for="cp in companys" :key="cp.id" :label="cp.name" :value="cp.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <template #footer>
@@ -491,6 +467,7 @@ import {
   getCompany,
   deleteuser,
   viewmanagecompany,
+  verifyuser
 } from "../api/services";
 import { Watch } from "@element-plus/icons-vue";
 import { watch } from "vue";
@@ -535,7 +512,7 @@ const userDataStore = useUserDataStore()
 const canedit = computed(() =>
   userDataStore.permissions?.some((p) => p.name === "edit.user"),
 );
-const candadd = computed(()=>
+const candadd = computed(() =>
   userDataStore.permissions?.some((p) => p.name === "add.user")
 )
 const activeTab = ref("general");
@@ -631,7 +608,7 @@ const debouncedFetch = debounce(() => {
 watch(() => filters.name, debouncedFetch);
 const createForm = reactive({
   company_ids: [],
-  manage_company:null,
+  manage_company: null,
   company_id: null,
   name: "",
   phone_hash: "",
@@ -895,6 +872,24 @@ async function toggleStatus(row) {
   }
 }
 
+async function VerifyUser(row) {
+  try {
+    await verifyuser(row.id);
+    ElNotification.success({
+      title: "Success",
+      message: "Verify Success",
+      offset: 10,
+    });
+    fetchUsers();
+  } catch (e) {
+    ElNotification.error({
+      title: "Error",
+      message: e.response?.data?.error,
+      offset: 100,
+    });
+  }
+}
+
 async function DeleteUser(row) {
   try {
     await ElMessageBox.confirm(
@@ -1032,6 +1027,7 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
 }
+
 .verified-badge {
   color: #1d9bf0;
   display: inline-flex;

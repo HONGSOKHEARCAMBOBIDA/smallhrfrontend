@@ -4,52 +4,38 @@
       <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <el-text style="color: black; font-size: 18px; font-weight: bold;">វត្តមាន</el-text>
       </div>
-<el-row justify="space-between" align="middle">
+      <el-row justify="space-between" align="middle">
         <el-text style="color: black; font-size: 18px; font-weight: bold;">
-        {{ new Date().toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
-      </el-text>
-      <AppButton type="success"  size="large" @click="getLocation()"  icon="MapLocation">
-        ទាញទីតាំង
-      </AppButton>
-</el-row>
+          {{ new Date().toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+          }}
+        </el-text>
+        <AppButton type="success" size="large" @click="getLocation()" icon="MapLocation">
+          ទាញទីតាំង
+        </AppButton>
+      </el-row>
     </template>
     <el-form :model="attendForm">
-      <el-form-item label="មូលហេតុ" :required="reasonRequired">
-        <el-input
-          type="textarea"
-          v-model="attendForm.reason"
-          :placeholder="reasonPlaceholder"
-          style="width: 100%;"
-        />
+      <el-form-item label="មូលហេតុ*" :required="reasonRequired">
+        <el-input type="textarea" v-model="attendForm.reason" :placeholder="reasonPlaceholder" style="width: 100%;" />
       </el-form-item>
 
       <!-- Draft info row -->
       <el-form-item v-if="draft">
         <div style="display: flex; justify-content: space-between; width: 100%; color: #606266; font-size: 14px;">
-          <span>{{ draft.type_string }}</span>
-          <span>ម៉ោងកំណត់: {{ draft.scheduled_time }}</span>
+          <el-text tag="b">{{ draft.type_string }}</el-text>
+          <el-text tag="b" style="color: black;">ម៉ោងកំណត់: {{ draft.scheduled_time }}</el-text>
         </div>
       </el-form-item>
 
       <!-- Late / early-leave warning -->
       <el-form-item v-if="reasonRequired">
-        <el-alert
-          :title="isLate ? 'អ្នកមកយឺត សូមបញ្ចូលមូលហេតុ' : 'អ្នកចេញមុនម៉ោង សូមបញ្ចូលមូលហេតុ'"
-          type="warning"
-          show-icon
-          :closable="false"
-        />
+        <el-alert :title="isLate ? 'អ្នកមកយឺត សូមបញ្ចូលមូលហេតុ' : 'អ្នកចេញមុនម៉ោង សូមបញ្ចូលមូលហេតុ'" type="warning"
+          show-icon :closable="false" />
       </el-form-item>
 
       <el-form-item>
-        <el-button
-          :type="isCheckInType ? 'primary' : 'warning'"
-          :loading="loading || draftLoading"
-          :disabled="isButtonDisabled"
-          @click="handleCheckIn"
-          size="large"
-          style="width: 100%; height: 80px;"
-        >
+        <el-button :type="isCheckInType ? 'primary' : 'warning'" :loading="loading || draftLoading"
+          :disabled="isButtonDisabled" @click="handleCheckIn" size="large" style="width: 100%; height: 80px;">
           <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
             <div style="padding-top: 1px; padding-bottom: 10px; padding-left: 16px; padding-right: 16px;">
               <span style="font-size: 22px;">
@@ -79,7 +65,7 @@ const currentTime = ref('')
 const loading = ref(false)
 const attendForm = reactive({ latitude: '', longitude: '', reason: '' })
 
-const draft = ref(null)       
+const draft = ref(null)
 const draftLoading = ref(false)
 const draftError = ref('')
 
@@ -144,10 +130,10 @@ function getLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       ElNotification({
-    title: 'មានបញ្ហាទីតាំង',
-    message: 'Geolocation not supported',
-    type: 'error',
-  })
+        title: 'មានបញ្ហាទីតាំង',
+        message: 'Geolocation not supported',
+        type: 'error',
+      })
       return reject()
     }
     navigator.geolocation.getCurrentPosition(
@@ -157,11 +143,11 @@ function getLocation() {
         resolve()
       },
       () => {
-         ElNotification({
-    title: 'មានបញ្ហាទីតាំង',
-    message: 'ចាប់ទីតាំងមិនបាន',
-    type: 'error',
-  })
+        ElNotification({
+          title: 'មានបញ្ហាទីតាំង',
+          message: 'ចាប់ទីតាំងមិនបាន',
+          type: 'error',
+        })
         reject()
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -182,28 +168,28 @@ async function handleCheckIn() {
   }
   if (!attendForm.latitude || !attendForm.longitude) {
     return ElNotification({
-    title: 'មានបញ្ហាទីតាំង',
-    message: 'មិនអាចទទួលបានទីតាំង សូមបើកការអនុញ្ញាត GPS',
-    type: 'error',
-  })
+      title: 'មានបញ្ហាទីតាំង',
+      message: 'មិនអាចទទួលបានទីតាំង សូមបើកការអនុញ្ញាត GPS',
+      type: 'error',
+    })
   }
   loading.value = true
   try {
     await createAttendance(attendForm)
-      ElNotification({
-    title: 'ជោគជ័យ',
-    message: 'ចុះវត្តមានបានជោគជ័យ',
-    type: 'success',
-  })
+    ElNotification({
+      title: 'ជោគជ័យ',
+      message: 'ចុះវត្តមានបានជោគជ័យ',
+      type: 'success',
+    })
     attendForm.reason = ''
     // Refresh draft so the button updates to the next session
     await fetchDraft()
   } catch (e) {
     ElNotification({
-    title: 'មានបញ្ហា',
-    message:  e.response?.data?.error || "",
-    type: 'error',
-  })
+      title: 'មានបញ្ហា',
+      message: e.response?.data?.error || "",
+      type: 'error',
+    })
   } finally {
     loading.value = false
   }
@@ -220,5 +206,7 @@ onUnmounted(() => clearInterval(timer))
 </script>
 
 <style scoped>
-.checkin-card { border-radius: 6px; }
+.checkin-card {
+  border-radius: 6px;
+}
 </style>

@@ -24,6 +24,7 @@ export const countuser = () => api.get('/count.user')
 export const getrole = () => api.get('/view.role')
 export const getuserdata = () => api.get(`/view.user.data`)
 export const getuserapprove = () => api.get(`/view.user.approve`)
+export const verifyuser = (id) => api.put(`verify.user/${id}`)
 
 // Shift
 export const createShift = (data) => api.post('/add.shift', data)
