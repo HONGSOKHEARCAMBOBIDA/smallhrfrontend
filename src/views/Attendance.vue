@@ -214,6 +214,16 @@
         <template #check_out2="{ row }">
           <CheckCell :time="row.check_out2" :diff="row.check_out2_diff" />
         </template>
+        <template #actions="{row}">
+           <AppButton
+                v-if=candeleteattendance
+                size="small"
+                icon="Delete"
+                type="danger"
+                circle
+                @click="deleteattendancev1(row)"
+              />
+        </template>
       </AppTable>
     </el-card>
   </div>
@@ -310,13 +320,16 @@ onMounted(fetchAttendance);
 </script> -->
 
 <script setup>
-import { ref, reactive, onMounted, h } from "vue";
+import { ref, reactive, onMounted, h, computed } from "vue";
 import { ElMessage } from "element-plus";
-import { getAttendance,exportAttendancePDF, getCompany } from "../api/services";
+import { getAttendance,exportAttendancePDF, getCompany,deleteattendance } from "../api/services";
 import AppFilterBar from "../../components/AppFilterBar.vue";
 import AppButton from "../../components/AppButton.vue";
 import AppTable from "../../components/AppTable.vue";
-
+import { useNotification } from "../../composables/useNotification.js";
+import { useUserDataStore } from "../stores/user_data.js";
+const userDataStore = useUserDataStore();
+const notify = useNotification()
 const attendance = ref([]);
 const loading = ref(false);
 const page = ref(1);
@@ -328,6 +341,8 @@ const filters = reactive({
   check_date: new Date().toISOString().split("T")[0],
   company_id: "",
 });
+
+const candeleteattendance = computed(()=>userDataStore.permissions?.some((p)=> p.name === "delete.backup"))
 
 // small functional component to render time + colored diff badge underneath
 const CheckCell = (props) => {
@@ -356,6 +371,18 @@ async function fetchCompany() {
     ElMessage.error("Failed to load employees");
   } finally {
     loading.value = false;
+  }
+}
+
+async function deleteattendancev1(row) {
+  try {
+    await deleteattendance(row.id);
+    notify.success("Delete success");
+    await fetchAttendance()
+  }catch(e){
+ notify.error(
+      e.response?.data?.error || "មិនអាចធ្វើបច្ចុប្បន្នភាពស្ថានភាពបានទេ",
+    );
   }
 }
 

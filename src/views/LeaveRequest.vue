@@ -269,7 +269,12 @@ onUnmounted(() => clearTimeout(searchTimer));
       <template #name>
         <AppInput
           v-model="filter.name"
-          placeholder="ស្វែងរក"
+          placeholder="ស្វែង);
+const userDataStore = useUserDataStore();
+
+const leaverequest = ref([]);
+const leavetype = ref([]);
+const leavededucttype = reរក"
           prefix-icon="Search"
           clearable
         >

@@ -37,6 +37,7 @@ export const getAttendanceDraft = (params) => api.get('/view.attendance.draft')
 export const exportAttendancePDF = (params) => api.get('/generate.attendance.pdf', {
   params,
 })
+export const deleteattendance = (id) => api.delete(`/delete.attendance/${id}`)
 
 // Payroll
 export const getPayrollDraft = (params) => api.get('/view.payroll.draft', { params })
