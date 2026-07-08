@@ -9,7 +9,7 @@
           {{ new Date().toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
           }}
         </el-text>
-        <AppButton type="success" size="large" @click="getLocation()" icon="MapLocation">
+        <AppButton type="success" size="large" @click="getLocation()" icon="MapLocation" plain>
           ទាញទីតាំង
         </AppButton>
       </el-row>
@@ -22,8 +22,11 @@
       <!-- Draft info row -->
       <el-form-item v-if="draft">
         <div style="display: flex; justify-content: space-between; width: 100%; color: #606266; font-size: 14px;">
-          <el-text tag="b">{{ draft.type_string }}</el-text>
+          <el-text tag="b" type="primary">{{ draft.type_string }}</el-text>
           <el-text tag="b" style="color: black;">ម៉ោងកំណត់: {{ draft.scheduled_time }}</el-text>
+          <el-switch v-model="attendForm.is_permission" size="large">
+
+          </el-switch>
         </div>
       </el-form-item>
 
@@ -63,7 +66,7 @@ import AppButton from "../../components/AppButton.vue";
 const now = ref(new Date())
 const currentTime = ref('')
 const loading = ref(false)
-const attendForm = reactive({ latitude: '', longitude: '', reason: '' })
+const attendForm = reactive({ latitude: '', longitude: '', reason: '',is_permission: false })
 
 const draft = ref(null)
 const draftLoading = ref(false)

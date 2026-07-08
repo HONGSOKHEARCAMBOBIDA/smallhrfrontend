@@ -2,10 +2,10 @@
   <div>
     <AppFilterBar
       :fields="[
-        { slot: 'payrollType', span: 5 },
+        { slot: 'payrollType', span: 6 },
         {slot: 'company',span: 6},
         { slot: 'getdraft', span: 6 },
-        { slot: 'createpayroll', span: 5 },
+        { slot: 'createpayroll', span: 6 },
       ]"
       :action-span="4"
     >

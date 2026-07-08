@@ -86,7 +86,8 @@ import { Html5Qrcode } from "html5-qrcode";
 import AppButton from "../../components/AppButton.vue";
 import AppInput from "../../components/AppInput.vue";
 import AppTabs from "../../components/AppTabs.vue";
-
+import { useNotification } from "../../composables/useNotification.js";
+const notify = useNotification();
 const router = useRouter();
 const auth = useAuthStore();
 const formRef = ref();
@@ -137,8 +138,9 @@ async function handleLogin() {
     const res = await login(form);
     auth.setAuth(res.data.data);
     router.push("/CreateAttendance");
+    notify.success("ចូលប្រព័ន្ធបានជោគជ័យ")
   } catch (e) {
-    ElMessage.error(e.response?.data?.message || "Login failed");
+    notify.error(e.response?.data?.message || "Login failed");
   } finally {
     loading.value = false;
   }

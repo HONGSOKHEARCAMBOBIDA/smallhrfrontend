@@ -1,10 +1,9 @@
 <template>
   <div>
     <AppFilterBar :fields="[
-      { slot: 'name', span: 8 },
+      { slot: 'name', span: 10 },
       { slot: 'role', span: 6 },
       { slot: 'company', span: 5 },
-      { slot: 'adduser', span: 5 }
     ]" :action-span="3">
       <template #name>
         <!-- <el-input v-model="filters.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable @input="fetchUsers" /> -->
@@ -26,7 +25,7 @@
           <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
         </el-select>
       </template>
-      <template #adduser>
+      <template #actions>
         <AppButton v-if="candadd" type="primary" @click="openCreate">
           បន្ថែមបុគ្គលិក
         </AppButton>
