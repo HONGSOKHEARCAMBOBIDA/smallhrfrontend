@@ -43,7 +43,7 @@
         clearable
         @change="loadAttendance"
         style="width: 100%"
-        size="default"
+        size="large"
       />
     </div>
   </template>
