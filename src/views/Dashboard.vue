@@ -26,7 +26,7 @@
           </div>
           <div class="action-btn" @click="$router.push('/company')">
             <el-icon size="26" color="#f56c6c"><OfficeBuilding /></el-icon>
-            <span>គ្រប់គ្រងក្រុមហ៑ុន</span>
+            <span>ក្រុមហ៑ុន</span>
           </div>
         </div>
       </el-card>

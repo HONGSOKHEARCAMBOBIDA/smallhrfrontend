@@ -349,9 +349,14 @@ const CheckCell = (props) => {
   if (!props.time) {
     return h("span", { style: "color:#c0c4cc" }, "—");
   }
-  const isLate = props.diff?.includes("យឺត") || props.diff?.includes("បន្ថែម");
-  const isEarly = props.diff?.includes("មុនម៉ោង");
-  const color = isLate ? "#f56c6c" : isEarly ? "#e6a23c" : "#67c23a";
+let color = "#909399"; 
+if (props.diff?.includes("យឺត")) {
+  color = "#f56c6c"; // Red
+} else if (props.diff?.includes("មុនម៉ោង")) {
+  color = "#e6a23c"; // Orange
+} else if (props.diff?.includes("បន្ថែម")) {
+  color = "#67c23a"; // Green
+}
 
   return h("div", [
     h("div", { style: "font-weight:600" }, props.time),
