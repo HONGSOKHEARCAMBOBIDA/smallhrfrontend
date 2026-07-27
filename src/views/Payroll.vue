@@ -88,12 +88,12 @@
         </template>
         <template #total_deduction="{ row }">
           <el-input v-model="row.total_deduction" :row="1">
-            <template #append>{{ row.currency }}</template>
+            <!-- <template #append>{{ row.currency }}</template> -->
           </el-input>
         </template>
         <template #net_salary="{ row }">
           <el-input v-model="row.net_salary">
-            <template #append>{{ row.currency }}</template>
+            <!-- <template #append>{{ row.currency }}</template> -->
           </el-input>
         </template>
       </AppTable>

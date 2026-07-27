@@ -7,6 +7,7 @@ export const useUserDataStore = defineStore('userdata', {
   }),
 
   getters: {
+    companyid: (state) => state.userdata?.company_id || '',
     name: (state) => state.userdata?.name || '',
     permissions: (state) => state.userdata?.permissions || [],
   },

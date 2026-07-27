@@ -36,6 +36,23 @@
           show-icon :closable="false" />
       </el-form-item>
 
+<el-form-item v-if="companies.length" label="ក្រុមហ៊ុន">
+  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+    <el-tag
+      v-for="c in companies"
+      :key="c.id"
+      :type="attendForm.company_id === c.id ? 'primary' : 'info'"
+      :effect="attendForm.company_id === c.id ? 'dark' : 'plain'"
+      :size="attendForm.company_id === c.id ? 'large' : 'default'"
+      style="cursor: pointer;"
+      @click="selectCompany(c.id)"
+    >
+      {{ c.name }}
+
+    </el-tag>
+  </div>
+</el-form-item>
+
       <el-form-item>
         <el-button :type="isCheckInType ? 'primary' : 'warning'" :loading="loading || draftLoading"
           :disabled="isButtonDisabled" @click="handleCheckIn" size="large" style="width: 100%; height: 80px;">
@@ -57,17 +74,36 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted,watch  } from 'vue'
 import { ElMessage } from 'element-plus'
 import { createAttendance, getAttendanceDraft } from '../api/services'
 import { ElNotification } from 'element-plus'
 import AppButton from "../../components/AppButton.vue";
-
+import { getCompany } from '../api/services';
+import { useUserDataStore } from '../stores/user_data'
 const now = ref(new Date())
 const currentTime = ref('')
 const loading = ref(false)
-const attendForm = reactive({ latitude: '', longitude: '', reason: ''})
+const attendForm = reactive({ latitude: '', longitude: '', reason: '',company_id: null})
+const companies = ref([])
+const userDataStore = useUserDataStore()
+function selectCompany(id) {
+  attendForm.company_id = id
+}
 
+const defaultcompanyid = computed(()=> userDataStore.companyid || null)
+
+async function fetchCompanies() {
+  loading.value = true;
+  try {
+    const res = await getCompany({
+    });
+    companies.value = res.data.data || [];
+  } catch (e) {
+  } finally {
+    loading.value = false;
+  }
+}
 const draft = ref(null)
 const draftLoading = ref(false)
 const draftError = ref('')
@@ -184,7 +220,8 @@ async function handleCheckIn() {
       message: 'ចុះវត្តមានបានជោគជ័យ',
       type: 'success',
     })
-    attendForm.reason = ''
+    attendForm.reason = '',
+    attendForm.company_id= null
     // Refresh draft so the button updates to the next session
     await fetchDraft()
   } catch (e) {
@@ -204,8 +241,21 @@ onMounted(() => {
   timer = setInterval(updateTime, 1000)
   getLocation()
   fetchDraft()
+  fetchCompanies()
 })
 onUnmounted(() => clearInterval(timer))
+
+watch(
+  () => [companies.value, defaultcompanyid.value],
+  ([list, defaultId]) => {
+    if (!list.length) return
+    const exists = list.some(c => c.id === defaultId)
+    if (exists && !attendForm.company_id) {
+      attendForm.company_id = defaultId
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
