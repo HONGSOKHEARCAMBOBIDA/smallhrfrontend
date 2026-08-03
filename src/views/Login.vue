@@ -137,7 +137,7 @@ async function handleLogin() {
   try {
     const res = await login(form);
     auth.setAuth(res.data.data);
-    router.push("/CreateAttendance");
+    router.push("/Dashboard");
     notify.success("ចូលប្រព័ន្ធបានជោគជ័យ")
   } catch (e) {
     notify.error(e.response?.data?.message || "Login failed");

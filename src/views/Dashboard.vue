@@ -2,7 +2,9 @@
   <div class="dashboard">
     <div class="dash-grid">
       <el-card class="dash-card">
-        <template #header><span class="card-title">សកម្មភាពរហ័ស</span></template>
+        <template #header
+          ><span class="card-title">សកម្មភាពរហ័ស</span></template
+        >
         <div class="action-grid">
           <div class="action-btn" @click="$router.push('/users')">
             <el-icon size="26" color="#409eff"><UserFilled /></el-icon>
@@ -32,149 +34,155 @@
       </el-card>
 
       <el-card class="dash-card">
-  <template #header>
-    <div class="card-header-row">
-      <span class="card-title">វត្តមានក្នុងថ្ងៃនេះ</span>
-      <el-date-picker
-        v-model="filters.check_date"
-        type="date"
-        placeholder="ជ្រេីសរេីសថ្ងៃទី"
-        value-format="YYYY-MM-DD"
-        clearable
-        @change="loadAttendance"
-        style="width: 100%"
-        size="large"
-      />
-    </div>
-  </template>
-            <el-card>
-      <AppTable
-        :data="recentAttendance"
-        :loading="loading"
-        v-model:current-page="page"
-        v-model:page-size="pageSize"
-        :total="total"
-        @page-change="loadAttendance()"
-        :columns="[
-          { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
-          { prop: 'gender_string', label: 'ភេទ', minWidth: 90 },
-          { prop: 'role_name', label: 'តួនាទី', minWidth: 110 },
-          { prop: 'company_name', label: 'ក្រុមហ៑ុន', minWidth: 130 },
-          { prop: 'check_date', label: 'ថ្ងៃស្កែន', minWidth: 120 },
-          { label: 'ស្ថានភាព', slot: 'status', width: 100 },
-        ]"
-      >
-        <template #status="{ row }">
-          <el-tag
-            :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
-            size="small"
-          >
-            {{ row.status }}
-          </el-tag>
-        </template>
-
-        <template #actions="{ row }">
-          <div class="detail-action">
-            <el-badge
-              :value="row.attendance_record?.length || 0"
-              :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
-            >
-              <el-button
-                size="large"
-                icon="List"
-                circle
-                @click="viewRecords(row)"
-              />
-            </el-badge>
+        <template #header>
+          <div class="card-header-row">
+            <span class="card-title">វត្តមានក្នុងថ្ងៃនេះ</span>
+            <el-date-picker
+              v-model="filters.check_date"
+              type="date"
+              placeholder="ជ្រេីសរេីសថ្ងៃទី"
+              value-format="YYYY-MM-DD"
+              clearable
+              @change="loadAttendance"
+              style="width: 100%"
+              size="large"
+            />
           </div>
         </template>
-      </AppTable>
-    </el-card>
-
-
-    <AppDialog
-      v-model="recordsDialog"
-      :title="`លម្អិត — ${selectedRow?.name}`"
-      width="60%"
-    >
-      <AppTable
-        :data="selectedRow?.attendance_record || []"
-        :total="selectedRow?.attendance_record.length || []"
-        :columns="[
-          { prop: 'day_string', label: 'ថ្ងៃ', width: 100 },
-          { prop: 'type_string', label: 'ប្រភេទ', width: 150 },
-          { prop: 'check_time', label: 'ម៉ោងបានស្កែន', width: 150 },
-          { prop: 'scheduled_time', label: 'ម៉ោងត្រូវស្កែន', width: 110 },
-          { prop: 'time_diff', label: 'យឺត/មុនម៉ោង', width: 150 },
-          { label: 'ស្ថានភាព', slot: 'attendance_type_name', width: 100 },
-          { label: 'ទីតាំងស្កែន', slot: 'check_location' },
-          { label: 'មេីលទីតាំង', slot: 'view_location' },
-          { prop: 'reason', label: 'មូលហេតុ', width: 120 },
-        ]"
-      >
-        <template #attendance_type_name="{ row }">
-          <el-tag size="small" :type="getAttendTypeTag(row.attendance_type)">
-            {{ row.attendance_type_name || "—" }}
-          </el-tag>
-        </template>
-        <template #check_location="{ row }">
-          <el-icon size="large" :color="row.inzone ? '#67c23a' : '#f56c6c'">
-            <component
-              :is="row.inzone ? 'CircleCheckFilled' : 'CircleCloseFilled'"
-            />
-          </el-icon>
-        </template>
-        <template #view_location="{ row }">
-          <el-icon
-            size="large"
-            :color="row.inzone ? '#67c23a' : '#f56c6c'"
-            style="cursor: pointer"
-            @click="openLocation(row)"
+        <el-card>
+          <AppTable
+            :data="recentAttendance"
+            :loading="loading"
+            v-model:current-page="page"
+            v-model:page-size="pageSize"
+            :total="total"
+            @page-change="loadAttendance()"
+            :columns="[
+              { prop: 'name', label: 'ឈ្មោះ', minWidth: 110 },
+              { prop: 'gender_string', label: 'ភេទ', minWidth: 90 },
+              { prop: 'role_name', label: 'តួនាទី', minWidth: 110 },
+              { prop: 'company_name', label: 'ក្រុមហ៑ុន', minWidth: 130 },
+              { prop: 'check_date', label: 'ថ្ងៃស្កែន', minWidth: 120 },
+              { label: 'ស្ថានភាព', slot: 'status', width: 100 },
+            ]"
           >
-            <LocationInformation />
-          </el-icon>
-        </template>
-      </AppTable>
-    </AppDialog>
+            <template #status="{ row }">
+              <el-tag
+                :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
+                size="small"
+              >
+                {{ row.status }}
+              </el-tag>
+            </template>
+
+            <template #actions="{ row }">
+              <div class="detail-action">
+                <el-badge
+                  :value="row.attendance_record?.length || 0"
+                  :type="row.status === 'COMPLETE' ? 'success' : 'warning'"
+                >
+                  <el-button
+                    size="large"
+                    icon="List"
+                    circle
+                    @click="viewRecords(row)"
+                  />
+                </el-badge>
+              </div>
+            </template>
+          </AppTable>
+        </el-card>
+
+        <AppDialog
+          v-model="recordsDialog"
+          :title="`លម្អិត — ${selectedRow?.name}`"
+          width="60%"
+        >
+          <AppTable
+            :data="selectedRow?.attendance_record || []"
+            :total="selectedRow?.attendance_record.length || []"
+            :columns="[
+              { prop: 'day_string', label: 'ថ្ងៃ', width: 100 },
+              { prop: 'type_string', label: 'ប្រភេទ', width: 150 },
+              { prop: 'check_time', label: 'ម៉ោងបានស្កែន', width: 150 },
+              { prop: 'scheduled_time', label: 'ម៉ោងត្រូវស្កែន', width: 110 },
+              { prop: 'time_diff', label: 'យឺត/មុនម៉ោង', width: 150 },
+              { label: 'ស្ថានភាព', slot: 'attendance_type_name', width: 100 },
+              { label: 'ទីតាំងស្កែន', slot: 'check_location' },
+              { label: 'មេីលទីតាំង', slot: 'view_location' },
+              { prop: 'reason', label: 'មូលហេតុ', width: 120 },
+            ]"
+          >
+            <template #attendance_type_name="{ row }">
+              <el-tag
+                size="small"
+                :type="getAttendTypeTag(row.attendance_type)"
+              >
+                {{ row.attendance_type_name || "—" }}
+              </el-tag>
+            </template>
+            <template #check_location="{ row }">
+              <el-icon size="large" :color="row.inzone ? '#67c23a' : '#f56c6c'">
+                <component
+                  :is="row.inzone ? 'CircleCheckFilled' : 'CircleCloseFilled'"
+                />
+              </el-icon>
+            </template>
+            <template #view_location="{ row }">
+              <el-icon
+                size="large"
+                :color="row.inzone ? '#67c23a' : '#f56c6c'"
+                style="cursor: pointer"
+                @click="openLocation(row)"
+              >
+                <LocationInformation />
+              </el-icon>
+            </template>
+          </AppTable>
+        </AppDialog>
       </el-card>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
-import { getAttendance } from '../api/services'
-import { ElNotification } from 'element-plus'
-import AppTable from '../../components/AppTable.vue'
-import AppDialog from '../../components/AppDialog.vue'
+import { ref, onMounted, reactive, } from "vue";
+import { getAttendance } from "../api/services";
+import { ElNotification } from "element-plus";
+import AppTable from "../../components/AppTable.vue";
+import AppDialog from "../../components/AppDialog.vue";
 import { LocationInformation } from "@element-plus/icons-vue";
 
-const loading = ref(false)
-const recentAttendance = ref([])
+const loading = ref(false);
+const recentAttendance = ref([]);
 const recordsDialog = ref(false);
 const selectedRow = ref(null);
-const page = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
+const page = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
 const filters = reactive({
-  check_date: new Date().toISOString().split("T")[0],
-})
+  check_date: null
+});
 
 async function loadAttendance() {
-  loading.value = true
+  loading.value = true;
 
   try {
-    const params = {page: page.value,page_size: pageSize.value,check_date: filters.check_date};
-    const res = await getAttendance(params)
+    const params = {
+      page: page.value,
+      page_size: pageSize.value,
+      check_date: filters.check_date,
+    };
+    const res = await getAttendance(params);
     recentAttendance.value = res.data.data || [];
     total.value = res.data.pagination?.totalCount || 0;
   } catch (e) {
     ElNotification({
-      title: 'មានបញ្ហា',
-      message: e.response?.data?.error || e.message
-    })
+      title: "មានបញ្ហា",
+      message: e.response?.data?.error || e.message,
+    });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
@@ -194,8 +202,8 @@ function viewRecords(row) {
   recordsDialog.value = true;
 }
 onMounted(async () => {
-loadAttendance()
-})
+  // loadAttendance();
+});
 </script>
 
 <style scoped>
@@ -220,7 +228,7 @@ loadAttendance()
   display: flex;
   align-items: center;
   gap: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .stat-icon {
   width: 48px;
@@ -231,9 +239,16 @@ loadAttendance()
   justify-content: center;
   flex-shrink: 0;
 }
-.stat-value { font-size: 24px; font-weight: 700; color: #1a1a2e; }
-.stat-label { font-size: 12px; color: #888; margin-top: 2px; }
-
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.stat-label {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
 
 /* ── Dashboard two-col grid ──────────────────── */
 .dash-grid {
@@ -243,8 +258,14 @@ loadAttendance()
   margin-top: 16px;
 }
 
-.dash-card { border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.card-title { font-weight: 600; font-size: 14px; }
+.dash-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.card-title {
+  font-weight: 600;
+  font-size: 14px;
+}
 
 /* ── Quick actions ────────────────────────────── */
 .action-grid {
@@ -281,8 +302,13 @@ loadAttendance()
   padding: 9px 0;
   border-bottom: 1px solid #f5f5f5;
 }
-.attend-row:last-child { border-bottom: none; }
-.attend-info { flex: 1; min-width: 0; }
+.attend-row:last-child {
+  border-bottom: none;
+}
+.attend-info {
+  flex: 1;
+  min-width: 0;
+}
 .attend-name {
   font-weight: 500;
   font-size: 13px;
@@ -290,7 +316,10 @@ loadAttendance()
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.attend-meta { font-size: 11px; color: #13097b; }
+.attend-meta {
+  font-size: 11px;
+  color: #13097b;
+}
 
 .detail-action {
   padding: 10px 0;
@@ -310,20 +339,32 @@ loadAttendance()
     gap: 10px;
   }
 
-  .stat-card  { padding: 12px; gap: 10px; }
-  .stat-icon  { width: 40px; height: 40px; }
-  .stat-value { font-size: 20px; }
-  .stat-label { font-size: 11px; }
+  .stat-card {
+    padding: 12px;
+    gap: 10px;
+  }
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .stat-value {
+    font-size: 20px;
+  }
+  .stat-label {
+    font-size: 11px;
+  }
 
   .dash-grid {
-    grid-template-columns: 1fr;   /* stack vertically */
+    grid-template-columns: 1fr; /* stack vertically */
     gap: 12px;
   }
 }
 
-
 @media (max-width: 400px) {
   /* Very small screens: action buttons tighter */
-  .action-btn { padding: 12px 6px; font-size: 11px; }
+  .action-btn {
+    padding: 12px 6px;
+    font-size: 11px;
+  }
 }
 </style>

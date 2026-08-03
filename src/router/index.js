@@ -11,7 +11,7 @@ const routes = [
   {
     path: "/",
     component: () => import("../views/Layout.vue"),
-    redirect: "/CreateAttendance",
+    redirect: "/Dashboard",
     children: [
       {
         path: "dashboard",
@@ -166,7 +166,7 @@ router.beforeEach((to) => {
     return { name: "Login" };
   }
   if (to.name === "Login" && auth.isLoggedIn) {
-    return { name: "CreateAttendance" };
+    return { name: "Dashboard" };
   }
   if (to.meta.permission) {
     const hasPermission = userDataStore.permissions?.some(

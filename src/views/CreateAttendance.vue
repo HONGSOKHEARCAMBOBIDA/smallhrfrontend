@@ -10,11 +10,14 @@
         "
       >
         <el-text style="color: black; font-size: 18px; font-weight: bold"
-          >វត្តមាន</el-text
+          >{{ draft?.type_string ?? "វត្តមាន" }}</el-text
         >
       </div>
       <el-row justify="space-between" align="middle">
-        <el-text style="color: black; font-size: 18px; font-weight: bold">
+          <el-icon color="#409efc" :size="25">
+   <Calendar />
+  </el-icon>
+        <el-text style="color: black; font-size: 13px; ">
           {{
             new Date().toLocaleDateString("km-KH", {
               weekday: "long",
@@ -26,24 +29,16 @@
         </el-text>
         <AppButton
           type="success"
-          size="large"
+          size="small"
           @click="getLocation()"
           icon="MapLocation"
-          plain
+          circle
         >
-          ទាញទីតាំង
         </AppButton>
       </el-row>
     </template>
     <el-form :model="attendForm">
-      <el-form-item label="មូលហេតុ" :required="reasonRequired">
-        <el-input
-          type="textarea"
-          v-model="attendForm.reason"
-          :placeholder="reasonPlaceholder"
-          style="width: 100%"
-        />
-      </el-form-item>
+
 
       <!-- Draft info row -->
       <el-form-item v-if="draft">
@@ -56,10 +51,23 @@
             font-size: 14px;
           "
         >
-          <el-text tag="b" type="primary">{{ draft.type_string }}</el-text>
-          <el-text tag="b" style="color: black"
+        <el-row justify="space-between" align="middle">
+
+   <el-icon color="#409efc" :size="25" style="padding-right: 5px;"><AlarmClock /></el-icon>
+
+            <el-text tag="b" type="primary">
+            
+            {{ draft.type_string }}
+          
+          </el-text>
+        </el-row>
+
+          <el-row justify="space-between" align="middle">
+             <el-icon color="brown" :size="25" style="padding-right: 5px;"><AlarmClock /></el-icon>
+            <el-text style="color: brown;"
             >ម៉ោងកំណត់: {{ draft.scheduled_time }}</el-text
           >
+          </el-row>
           <!-- <el-switch v-model="attendForm.is_permission" size="large">
 
           </el-switch> -->
@@ -79,8 +87,16 @@
           :closable="false"
         />
       </el-form-item>
+            <el-form-item label="មូលហេតុ" :required="reasonRequired">
+        <el-input
+          type="textarea"
+          v-model="attendForm.reason"
+          :placeholder="reasonPlaceholder"
+          style="width: 100%"
+        />
+      </el-form-item>
 
-      <el-form-item v-if="companies.length" label="ក្រុមហ៊ុន">
+      <el-form-item v-if="companies.length" label="ក្រុមហ៊ុន" required>
         <div style="display: flex; flex-wrap: wrap; gap: 8px">
           <el-tag
             v-for="c in companies"
@@ -90,7 +106,8 @@
             :size="attendForm.company_id === c.id ? 'large' : 'default'"
             style="cursor: pointer"
             @click="selectCompany(c.id)"
-          >
+          > 
+          
             {{ c.name }}
           </el-tag>
         </div>
@@ -122,11 +139,7 @@
               "
             >
               <span style="font-size: 22px">
-                {{
-                  draftLoading
-                    ? "កំពុងផ្ទុក..."
-                    : (draft?.type_string ?? "ចុះវត្តមាន")
-                }}
+                 {{ isCheckInType ? 'ចូល' : 'ចេញ' }}
               </span>
             </div>
             <span style="font-size: 13px; opacity: 0.95">{{
@@ -154,8 +167,9 @@ import { ElMessage } from "element-plus";
 import { createAttendance, getAttendanceDraft } from "../api/services";
 import { ElNotification } from "element-plus";
 import AppButton from "../../components/AppButton.vue";
-import { getCompany } from "../api/services";
+import { viewcompanyscan } from "../api/services";
 import { useUserDataStore } from "../stores/user_data";
+import { Calendar } from "@element-plus/icons-vue";
 const now = ref(new Date());
 const currentTime = ref("");
 const loading = ref(false);
@@ -176,7 +190,7 @@ const defaultcompanyid = computed(() => userDataStore.companyid || null);
 async function fetchCompanies() {
   loading.value = true;
   try {
-    const res = await getCompany({});
+    const res = await viewcompanyscan({});
     companies.value = res.data.data || [];
   } catch (e) {
   } finally {
@@ -313,7 +327,7 @@ async function handleCheckIn() {
       message: "ចុះវត្តមានបានជោគជ័យ",
       type: "success",
     });
-    ((attendForm.reason = ""), (attendForm.company_id = null));
+    ((attendForm.reason = ""));
     // Refresh draft so the button updates to the next session
     await fetchDraft();
   } catch (e) {
