@@ -4,6 +4,7 @@
       { slot: 'name', span: 10 },
       { slot: 'role', span: 6 },
       { slot: 'company', span: 5 },
+      { slot: 'add', span: 3 }
     ]" :action-span="3">
       <template #name>
         <!-- <el-input v-model="filters.name" placeholder="ស្វែងរក" prefix-icon="Search" clearable @input="fetchUsers" /> -->
@@ -25,7 +26,7 @@
           <el-option v-for="company in companys" :key="company.id" :label="company.name" :value="company.id" />
         </el-select>
       </template>
-      <template #actions>
+      <template #add>
         <AppButton v-if="candadd" type="primary" @click="openCreate">
           បន្ថែមបុគ្គលិក
         </AppButton>
@@ -68,34 +69,32 @@
           </el-button>
         </template>
         <template #status="{ row }">
-         <el-text
-  :style="{ color: row.is_active ? 'black' : 'red' }"
->
-  {{ row.is_active ? "កំពុងធ្វើការ" : "ឈប់ធ្វើការ" }}
-</el-text>
- 
+          <el-text :style="{ color: row.is_active ? 'black' : 'red' }">
+            {{ row.is_active ? "កំពុងធ្វើការ" : "ឈប់ធ្វើការ" }}
+          </el-text>
+
         </template>
         <template #actions="{ row }" v-if="canedit">
-<el-tooltip content="កែប្រែ" placement="top">
+          <el-tooltip content="កែប្រែ" placement="top">
             <AppButton size="small" icon="Edit" type="warning" circle @click="openEdit(row)">
-          </AppButton>
-</el-tooltip>
-<el-tooltip content="បិទ" placement="top">
+            </AppButton>
+          </el-tooltip>
+          <el-tooltip content="បិទ" placement="top">
             <AppButton size="small" :icon="row.is_active ? 'CircleClose' : 'CircleCheck'"
-            :type="row.is_active ? 'danger' : 'success'" circle @click="toggleStatus(row)">
-          </AppButton>
-</el-tooltip>
-<el-tooltip content="ម៉ោងធ្វេីការ" placement="top">
+              :type="row.is_active ? 'danger' : 'success'" circle @click="toggleStatus(row)">
+            </AppButton>
+          </el-tooltip>
+          <el-tooltip content="ម៉ោងធ្វេីការ" placement="top">
             <AppButton size="small" icon="View" type="primary" circle @click="openShifts(row)">
-          </AppButton>
-</el-tooltip>
+            </AppButton>
+          </el-tooltip>
           <AppButton v-show="false" size="small" icon="Delete" type="danger" circle @click="DeleteUser(row)">
           </AppButton>
-<el-tooltip content="Verify" placement="top">
+          <el-tooltip content="Verify" placement="top">
             <AppButton size="small" icon="CircleCheck" type="info" circle @click="VerifyUser(row)">
 
-          </AppButton>
-</el-tooltip>
+            </AppButton>
+          </el-tooltip>
         </template>
       </AppTable>
     </el-card>
@@ -464,11 +463,11 @@ import {
   updateShift,
   createShift,
   getCompany,
+  viewcompanyscan,
   deleteuser,
   viewmanagecompany,
   verifyuser
 } from "../api/services";
-import { Watch } from "@element-plus/icons-vue";
 import { watch } from "vue";
 import { debounce } from "lodash-es";
 import QRCode from "qrcode";
@@ -700,7 +699,7 @@ async function fetchmanagecompany() {
 async function fetchCompany() {
   loading.value = true;
   try {
-    const res = await getCompany();
+    const res = await viewcompanyscan();
     companys.value = res.data.data || [];
   } catch {
     ElMessage.error("Failed to load employees");

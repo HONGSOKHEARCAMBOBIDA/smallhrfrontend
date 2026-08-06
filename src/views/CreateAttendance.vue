@@ -403,7 +403,7 @@ watch(
   justify-content: space-between;
   align-items: center;
 
-  padding: 4px 18px;
+  padding: 6px 18px;
 
   border: 1px solid #e5e7eb;
   border-radius: 14px;

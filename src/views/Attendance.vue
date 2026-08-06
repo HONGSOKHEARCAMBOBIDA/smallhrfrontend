@@ -216,6 +216,7 @@
         </template>
         <template #actions="{row}">
            <AppButton
+                v-show="false"
                 v-if=candeleteattendance
                 size="small"
                 icon="Delete"
