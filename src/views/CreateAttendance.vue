@@ -87,7 +87,7 @@
           :closable="false"
         />
       </el-form-item>
-            <el-form-item label="មូលហេតុ" :required="reasonRequired">
+            <el-form-item label="មូលហេតុ" :required="reasonRequired" v-show="reasonRequired">
         <el-input
           type="textarea"
           v-model="attendForm.reason"
@@ -96,22 +96,41 @@
         />
       </el-form-item>
 
-      <el-form-item v-if="companies.length" label="ក្រុមហ៊ុន" required>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px">
-          <el-tag
-            v-for="c in companies"
-            :key="c.id"
-            :type="attendForm.company_id === c.id ? 'primary' : 'info'"
-            :effect="attendForm.company_id === c.id ? 'dark' : 'plain'"
-            :size="attendForm.company_id === c.id ? 'large' : 'default'"
-            style="cursor: pointer"
-            @click="selectCompany(c.id)"
-          > 
+<el-form-item v-if="companies.length">
+  <div class="company-list">
+    <div
+      v-for="c in companies"
+      :key="c.id"
+      class="company-card"
+      :class="{ active: attendForm.company_id === c.id }"
+      @click="selectCompany(c.id)"
+    >
+      <div class="company-left">
+        <el-avatar
+          :size="40"
           
+          icon="OfficeBuilding"
+        />
+
+        <div class="company-info">
+          <div class="company-name">
             {{ c.name }}
-          </el-tag>
+          </div>
         </div>
-      </el-form-item>
+      </div>
+
+      <div class="company-right">
+        <el-icon v-if="attendForm.company_id === c.id" class="selected">
+          <CircleCheckFilled />
+        </el-icon>
+
+        <el-icon v-else>
+          <ArrowRight />
+        </el-icon>
+      </div>
+    </div>
+  </div>
+</el-form-item>
 
       <el-form-item>
         <el-button
@@ -170,6 +189,11 @@ import AppButton from "../../components/AppButton.vue";
 import { viewcompanyscan } from "../api/services";
 import { useUserDataStore } from "../stores/user_data";
 import { Calendar } from "@element-plus/icons-vue";
+import {
+  CircleCheckFilled,
+  ArrowRight,
+  OfficeBuilding
+} from '@element-plus/icons-vue'
 const now = ref(new Date());
 const currentTime = ref("");
 const loading = ref(false);
@@ -367,5 +391,68 @@ watch(
 <style scoped>
 .checkin-card {
   border-radius: 6px;
+}
+.company-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.company-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 4px 18px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  background: #fff;
+
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.company-card:hover {
+  border-color: #409EFF;
+  box-shadow: 0 6px 16px rgba(64,158,255,.12);
+}
+
+.company-card.active {
+  border: 2px solid #409EFF;
+  background: #f5f9ff;
+}
+
+.company-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.company-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.company-sub {
+  font-size: 13px;
+  color: #909399;
+  margin-top: 4px;
+}
+
+.company-right {
+  font-size: 22px;
+  color: #409EFF;
+}
+
+.selected {
+  color: #409EFF;
 }
 </style>
