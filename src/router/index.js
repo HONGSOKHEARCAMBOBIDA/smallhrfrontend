@@ -108,9 +108,9 @@ const routes = [
         name: "Payrolllist",
         component: () => import("../views/PayrollList.vue"),
         meta: {
-          title: "ប្រាក់ខែ",
+          title: "របាយការណ៍បើកប្រាក់ខែ",
           icon: "Money",
-          short: "ប្រាក់ខែ",
+          short: "របាយការណ៍បើកប្រាក់ខែ",
           showInNav: true,
         },
       },
