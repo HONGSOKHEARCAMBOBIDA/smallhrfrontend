@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-      target: 'https://api-hr-system-khmer-dev.hearpaytrack.uk',
+      target: 'https://api-hr.hearpaytrack.uk',
        // target: 'http://localhost:8080',
       //  target: 'http://192.241.132.206:8080',
         changeOrigin: true,
